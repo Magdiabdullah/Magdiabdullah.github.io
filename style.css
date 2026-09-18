@@ -512,7 +512,7 @@ img {
 }
 
 
-.hero h1 {
+.hero .hero-name {
 
     margin-top: 4px;
 
@@ -532,7 +532,7 @@ img {
 }
 
 
-.hero h1 span {
+.hero .hero-name span {
 
     display: block;
 
@@ -542,7 +542,7 @@ img {
 }
 
 
-.hero h2 {
+.hero .hero-role {
 
     margin-top: 25px;
 
@@ -2677,7 +2677,7 @@ footer {
     }
 
 
-    .hero h1 {
+    .hero .hero-name {
 
         font-size:
             clamp(
@@ -2689,7 +2689,7 @@ footer {
     }
 
 
-    .hero h2 {
+    .hero .hero-role {
 
         font-size:
             24px;
@@ -2906,6 +2906,217 @@ footer {
         align-items:
             flex-start;
 
+    }
+
+}
+
+/* =========================================================
+   RESPONSIVE POLISH
+   Preserves the original visual design.
+========================================================= */
+
+.hero-name {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    transition:
+        color .25s ease,
+        transform .25s ease,
+        text-shadow .25s ease;
+}
+
+.hero-name:hover,
+.hero-name:focus-visible {
+    color: var(--green);
+    transform: translateY(-2px);
+    text-shadow: 0 0 22px rgba(32,240,160,.12);
+}
+
+.hero-role {
+    transition:
+        color .25s ease,
+        transform .25s ease;
+}
+
+.hero-role:hover {
+    color: var(--green);
+    transform: translateX(3px);
+}
+
+.selector-item,
+.top-link,
+.hero-btn,
+.social-row a,
+.cv-button,
+.card-link,
+.hub-button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.selector-item {
+    touch-action: manipulation;
+    transition:
+        background .25s ease,
+        color .25s ease,
+        box-shadow .25s ease,
+        transform .2s ease;
+}
+
+.selector-item:hover,
+.selector-item:focus-visible {
+    transform: translateY(-2px);
+}
+
+.selector-item:active,
+.hero-btn:active,
+.cv-button:active,
+.social-row a:active,
+.hub-button:active,
+.card-link:active {
+    transform: scale(.98);
+}
+
+.experience-list {
+    display: grid;
+    gap: 18px;
+}
+
+.contact-location {
+    margin-top: 18px;
+    color: var(--green);
+    font-size: 11px;
+    letter-spacing: .08em;
+}
+
+@media (max-width: 1100px) {
+
+    .hero-container {
+        gap: 18px;
+    }
+
+    .hero-name {
+        font-size: clamp(50px, 7vw, 82px);
+    }
+
+}
+
+@media (max-width: 850px) {
+
+    .hero-container {
+        min-height: auto;
+    }
+
+    .hero-name {
+        font-size: clamp(48px, 11vw, 76px);
+        line-height: .93;
+    }
+
+    .hero-role {
+        font-size: clamp(21px, 5vw, 30px);
+    }
+
+    .hero-description {
+        width: min(100%, 620px);
+    }
+
+    .hero-visual {
+        max-width: 100%;
+        overflow: visible;
+    }
+
+    .large-card,
+    .publication-card,
+    .project-card,
+    .skill-card,
+    .certificate-card {
+        min-width: 0;
+    }
+
+}
+
+@media (max-width: 620px) {
+
+    .container {
+        width: calc(100% - 28px);
+    }
+
+    .hero-name {
+        width: 100%;
+        font-size: clamp(36px, 12.5vw, 62px);
+        line-height: .95;
+        letter-spacing: -.055em;
+    }
+
+    .hero-role {
+        width: 100%;
+        font-size: clamp(19px, 5.8vw, 25px);
+        line-height: 1.12;
+    }
+
+    .hello {
+        margin-top: 30px;
+        font-size: 17px;
+    }
+
+    .eyebrow {
+        font-size: 8px;
+        letter-spacing: .12em;
+    }
+
+    .hero-description {
+        font-size: 12px;
+        line-height: 1.75;
+    }
+
+    .hero-actions {
+        gap: 9px;
+    }
+
+    .hero-btn {
+        min-height: 48px;
+        padding-inline: 17px;
+    }
+
+    .social-row {
+        justify-content: center;
+    }
+
+    .selector-item {
+        min-height: 72px;
+        padding: 12px 10px;
+    }
+
+    .selector-item strong {
+        font-size: 8px;
+    }
+
+    .portfolio-section {
+        overflow: hidden;
+    }
+
+    .contact-links a {
+        overflow-wrap: anywhere;
+    }
+
+}
+
+@media (hover: none) {
+
+    .hero-name:hover,
+    .hero-role:hover,
+    .selector-item:hover {
+        transform: none;
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
     }
 
 }
