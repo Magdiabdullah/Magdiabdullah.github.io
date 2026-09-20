@@ -1451,6 +1451,7 @@
 
 
             <button
+                id="publishButton"
                 class="admin-btn primary"
                 onclick="publishNote()">
 
@@ -1670,6 +1671,9 @@ const LEGACY_DRAFT_KEY =
     "magdi_blog_current_draft";
 
 let currentDraftId =
+    null;
+
+let currentPublishedSlug =
     null;
 
 
@@ -1957,9 +1961,38 @@ function migrateLegacyDraft() {
 
 function saveDraft() {
 
-    saveCurrentDraft(
-        true
+    const saved =
+        saveCurrentDraft(true);
+
+    if (!saved) {
+
+        return;
+
+    }
+
+    /*
+       The draft has now been safely stored in MY DRAFTS.
+       Clear the editor so it is ready for a new note.
+    */
+
+    currentDraftId =
+        null;
+
+    currentPublishedSlug =
+        null;
+
+    clearEditor();
+
+    setPublishMode(false);
+
+    updateSaveStatus(
+        "DRAFT SAVED — EDITOR CLEARED"
     );
+
+    draftInfo.textContent =
+        "Draft saved. Start a new note when ready.";
+
+    articleContent.focus();
 
 }
 
@@ -3378,6 +3411,12 @@ function renderPublishedList(posts) {
                                 </button>
 
                                 <button
+                                    class="published-small-btn"
+                                    onclick="editPublishedNote('${slug}')">
+                                    EDIT
+                                </button>
+
+                                <button
                                     class="published-small-btn delete"
                                     onclick="deletePublishedNote('${slug}')">
                                     DELETE
@@ -3412,6 +3451,127 @@ function openPublishedNote(encodedSlug) {
         "_blank",
         "noopener,noreferrer"
     );
+}
+
+
+async function editPublishedNote(
+    encodedSlug
+) {
+
+    const slug =
+        decodeURIComponent(
+            encodedSlug
+        );
+
+    if (!slug) {
+        return;
+    }
+
+    if (hasEditorContent()) {
+
+        const confirmed =
+            confirm(
+                "The current editor contains content.\n\n" +
+                "Loading a published note will replace the current editor.\n\n" +
+                "Continue?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        autoSaveDraft();
+    }
+
+    try {
+
+        editorStatus.textContent =
+            "LOADING PUBLISHED NOTE...";
+
+        draftInfo.textContent =
+            "Loading article from GitHub...";
+
+        const response =
+            await fetch(
+                `/.netlify/functions/update-note?slug=${encodeURIComponent(slug)}`
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Could not load the published note."
+            );
+        }
+
+        const article =
+            result.article;
+
+        titleInput.value =
+            article.title || "";
+
+        categoryInput.value =
+            article.category || "";
+
+        tagsInput.value =
+            article.tags || "";
+
+        articleContent.innerHTML =
+            article.content || "";
+
+        currentPublishedSlug =
+            slug;
+
+        currentDraftId =
+            null;
+
+        setPublishMode(true);
+
+        document
+            .getElementById(
+                "publishedManager"
+            )
+            .classList.add(
+                "hidden"
+            );
+
+        editorStatus.textContent =
+            "EDITING PUBLISHED NOTE";
+
+        draftInfo.textContent =
+            "Changes are local until you click UPDATE NOTE.";
+
+        articleContent.focus();
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Edit published note error:",
+            error
+        );
+
+        editorStatus.textContent =
+            "EDIT FAILED";
+
+        draftInfo.textContent =
+            "Could not load the published note.";
+
+        alert(
+            "Could not load the published note.\n\n" +
+            error.message
+        );
+    }
 }
 
 
@@ -3586,6 +3746,49 @@ function closePreview() {
 
 
 /* =====================================================
+   EDITOR CLEAR / PUBLISH MODE
+===================================================== */
+
+function clearEditor() {
+
+    titleInput.value = "";
+
+    categoryInput.value = "";
+
+    tagsInput.value = "";
+
+    articleContent.innerHTML = "";
+
+    preview.classList.remove(
+        "active"
+    );
+
+    savedRange =
+        null;
+
+}
+
+
+function setPublishMode(isEditing) {
+
+    const button =
+        document.getElementById(
+            "publishButton"
+        );
+
+    if (!button) {
+        return;
+    }
+
+    button.textContent =
+        isEditing
+            ? "UPDATE NOTE"
+            : "PUBLISH NOTE";
+
+}
+
+
+/* =====================================================
    NEW NOTE
 ===================================================== */
 
@@ -3622,19 +3825,12 @@ function newNote() {
     currentDraftId =
         null;
 
+    currentPublishedSlug =
+        null;
 
-    titleInput.value = "";
+    clearEditor();
 
-    categoryInput.value = "";
-
-    tagsInput.value = "";
-
-    articleContent.innerHTML = "";
-
-
-    preview.classList.remove(
-        "active"
-    );
+    setPublishMode(false);
 
 
     updateSaveStatus(
@@ -3760,6 +3956,17 @@ async function publishNote() {
 
     };
 
+    const isEditingPublishedNote =
+        Boolean(
+            currentPublishedSlug
+        );
+
+    if (isEditingPublishedNote) {
+
+        articleData.slug =
+            currentPublishedSlug;
+    }
+
 
     try {
 
@@ -3771,7 +3978,9 @@ async function publishNote() {
         const response =
             await fetch(
 
-                "/.netlify/functions/publish-note",
+                isEditingPublishedNote
+                    ? "/.netlify/functions/update-note"
+                    : "/.netlify/functions/publish-note",
 
                 {
 
@@ -3828,26 +4037,65 @@ async function publishNote() {
         -------------------------------------------- */
 
         editorStatus.textContent =
-            "PUBLISHED";
-
+            isEditingPublishedNote
+                ? "UPDATED"
+                : "PUBLISHED";
 
         draftInfo.textContent =
-            "Article published successfully";
-
+            isEditingPublishedNote
+                ? "Article updated successfully"
+                : "Article published successfully";
 
         console.log(
-            "Published article:",
+            isEditingPublishedNote
+                ? "Updated article:"
+                : "Published article:",
             result
         );
 
+        /*
+           Only after GitHub confirms success do we remove
+           the local draft and clear the editor.
+        */
+
+        if (currentDraftId) {
+
+            const drafts =
+                getDrafts().filter(
+                    draft =>
+                        draft.id !==
+                        currentDraftId
+                );
+
+            setDrafts(
+                drafts
+            );
+        }
+
+        currentDraftId =
+            null;
+
+        currentPublishedSlug =
+            null;
+
+        clearEditor();
+
+        setPublishMode(false);
+
+        renderDraftList();
 
         alert(
-
-            "Article published successfully!\n\n" +
-
-            "GitHub has received the article."
-
+            isEditingPublishedNote
+                ? "Article updated successfully!\n\nThe editor has been cleared."
+                : "Article published successfully!\n\nThe editor has been cleared."
         );
+
+        draftInfo.textContent =
+            isEditingPublishedNote
+                ? "Article updated. Start a new note when ready."
+                : "Article published. Start a new note when ready.";
+
+        articleContent.focus();
 
 
     } catch (error) {
