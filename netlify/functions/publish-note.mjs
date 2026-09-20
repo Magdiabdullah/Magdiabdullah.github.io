@@ -596,7 +596,7 @@ function createArticleHTML({
    MAIN FUNCTION
 ===================================================== */
 
-export default async (request) {
+export default async (request) => {
 
     /*
         Only POST is allowed for publishing.
