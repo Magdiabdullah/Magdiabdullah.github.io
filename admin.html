@@ -905,6 +905,125 @@
         }
 
         /* =========================
+           PUBLISHED NOTES MANAGEMENT
+        ========================= */
+
+        .published-manager {
+            margin-top: 18px;
+            background: rgba(5, 12, 8, 0.9);
+            border: 1px solid rgba(0, 255, 140, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .published-manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .published-manager-title {
+            color: #00ff88;
+            font-family: monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .published-manager-subtitle {
+            color: #5e7868;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .published-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .published-empty {
+            padding: 20px;
+            border: 1px dashed rgba(0, 255, 140, 0.18);
+            border-radius: 7px;
+            color: #5e7868;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .published-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            background: #08100b;
+            border: 1px solid rgba(0, 255, 140, 0.10);
+            border-radius: 7px;
+        }
+
+        .published-item-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .published-item-title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .published-item-meta {
+            margin-top: 5px;
+            color: #5e7868;
+            font-family: monospace;
+            font-size: 10px;
+        }
+
+        .published-item-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .published-small-btn {
+            padding: 7px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 140, 0.20);
+            background: transparent;
+            color: #00ff88;
+            font-family: monospace;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .published-small-btn:hover {
+            background: rgba(0, 255, 140, 0.08);
+            border-color: #00ff88;
+        }
+
+        .published-small-btn.delete {
+            color: #ff7373;
+            border-color: rgba(255, 80, 80, 0.25);
+        }
+
+        .published-small-btn.delete:hover {
+            background: rgba(255, 80, 80, 0.08);
+            border-color: #ff7373;
+        }
+
+        .published-manager.hidden {
+            display: none;
+        }
+
+
+        /* =========================
            RESPONSIVE
         ========================= */
 
@@ -989,6 +1108,14 @@
                 onclick="toggleDraftManager()">
 
                 MY DRAFTS
+
+            </button>
+
+            <button
+                class="admin-btn"
+                onclick="togglePublishedManager()">
+
+                PUBLISHED NOTES
 
             </button>
 
@@ -1138,6 +1265,54 @@
         <div
             id="draftList"
             class="draft-list">
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         PUBLISHED NOTES MANAGEMENT
+    ========================= -->
+
+    <section
+        id="publishedManager"
+        class="published-manager hidden">
+
+        <div class="published-manager-header">
+
+            <div>
+
+                <div class="published-manager-title">
+                    PUBLISHED NOTES
+                </div>
+
+                <div class="published-manager-subtitle">
+                    These notes are stored in your GitHub repository.
+                </div>
+
+            </div>
+
+            <div class="published-item-actions">
+
+                <button
+                    class="admin-btn"
+                    onclick="loadPublishedNotes()">
+                    REFRESH
+                </button>
+
+                <button
+                    class="admin-btn"
+                    onclick="togglePublishedManager()">
+                    CLOSE
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            id="publishedList"
+            class="published-list">
         </div>
 
     </section>
@@ -3014,6 +3189,336 @@ function addCode() {
 
     autoSaveDraft();
 
+}
+
+
+/* =====================================================
+   PUBLISHED NOTES MANAGEMENT
+===================================================== */
+
+function togglePublishedManager() {
+
+    const manager =
+        document.getElementById(
+            "publishedManager"
+        );
+
+    const willOpen =
+        manager.classList.contains(
+            "hidden"
+        );
+
+    manager.classList.toggle(
+        "hidden"
+    );
+
+    if (willOpen) {
+        loadPublishedNotes();
+    }
+}
+
+
+function formatPublishedDate(value) {
+
+    if (!value) {
+        return "Unknown date";
+    }
+
+    try {
+
+        return new Date(
+            value
+        ).toLocaleDateString(
+            "en-US",
+            {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+            }
+        );
+
+    } catch {
+
+        return "Unknown date";
+    }
+}
+
+
+async function loadPublishedNotes() {
+
+    const list =
+        document.getElementById(
+            "publishedList"
+        );
+
+    if (!list) {
+        return;
+    }
+
+    list.innerHTML = `
+        <div class="published-empty">
+            Loading published notes...
+        </div>
+    `;
+
+    try {
+
+        const response =
+            await fetch(
+                "/.netlify/functions/manage-notes",
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Could not load published notes."
+            );
+        }
+
+        renderPublishedList(
+            result.posts || []
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Published notes error:",
+            error
+        );
+
+        list.innerHTML = `
+            <div class="published-empty">
+                Could not load published notes.<br><br>
+                ${escapeHTML(error.message)}
+            </div>
+        `;
+    }
+}
+
+
+function renderPublishedList(posts) {
+
+    const list =
+        document.getElementById(
+            "publishedList"
+        );
+
+    if (!posts.length) {
+
+        list.innerHTML = `
+            <div class="published-empty">
+                No published notes found.
+            </div>
+        `;
+
+        return;
+    }
+
+    list.innerHTML =
+        posts
+            .map(
+                post => {
+
+                    const title =
+                        escapeHTML(
+                            post.title ||
+                            "Untitled note"
+                        );
+
+                    const category =
+                        escapeHTML(
+                            post.category ||
+                            "Uncategorized"
+                        );
+
+                    const date =
+                        formatPublishedDate(
+                            post.date
+                        );
+
+                    const slug =
+                        encodeURIComponent(
+                            post.slug || ""
+                        );
+
+                    return `
+                        <div class="published-item">
+
+                            <div class="published-item-info">
+
+                                <div class="published-item-title">
+                                    ${title}
+                                </div>
+
+                                <div class="published-item-meta">
+                                    ${category}
+                                    •
+                                    ${date}
+                                </div>
+
+                            </div>
+
+                            <div class="published-item-actions">
+
+                                <button
+                                    class="published-small-btn"
+                                    onclick="openPublishedNote('${slug}')">
+                                    OPEN
+                                </button>
+
+                                <button
+                                    class="published-small-btn delete"
+                                    onclick="deletePublishedNote('${slug}')">
+                                    DELETE
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+}
+
+
+function openPublishedNote(encodedSlug) {
+
+    const slug =
+        decodeURIComponent(
+            encodedSlug
+        );
+
+    if (!slug) {
+        return;
+    }
+
+    const url =
+        `posts/${encodeURIComponent(slug)}.html`;
+
+    window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+
+
+async function deletePublishedNote(
+    encodedSlug
+) {
+
+    const slug =
+        decodeURIComponent(
+            encodedSlug
+        );
+
+    if (!slug) {
+        return;
+    }
+
+    const confirmed =
+        confirm(
+            `Delete published note "${slug}"?\n\n` +
+            "This will remove the note from the public blog, " +
+            "delete its article file, and delete its uploaded " +
+            "images from GitHub.\n\n" +
+            "This action cannot be undone."
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const list =
+        document.getElementById(
+            "publishedList"
+        );
+
+    list.innerHTML = `
+        <div class="published-empty">
+            Deleting note...
+        </div>
+    `;
+
+    try {
+
+        const response =
+            await fetch(
+                "/.netlify/functions/manage-notes",
+                {
+                    method: "DELETE",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify({
+                            slug: slug
+                        })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Could not delete the published note."
+            );
+        }
+
+        if (
+            result.cleanupComplete === false
+        ) {
+
+            alert(
+                "The note was removed from the public listing, " +
+                "but some GitHub files could not be cleaned up.\n\n" +
+                (result.cleanupErrors || []).join("\n")
+            );
+
+        } else {
+
+            alert(
+                "Published note deleted successfully."
+            );
+        }
+
+        await loadPublishedNotes();
+
+    } catch (error) {
+
+        console.error(
+            "Delete published note error:",
+            error
+        );
+
+        alert(
+            "Delete failed.\n\n" +
+            error.message
+        );
+
+        await loadPublishedNotes();
+    }
 }
 
 
