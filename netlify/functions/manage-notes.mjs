@@ -3,6 +3,7 @@ const API_BASE = "https://api.github.com";
 const OWNER = process.env.GITHUB_OWNER;
 const REPO = process.env.GITHUB_REPO;
 const TOKEN = process.env.GITHUB_TOKEN;
+
 const BRANCH = "main";
 
 
@@ -33,6 +34,47 @@ function jsonResponse(statusCode, body) {
    CMS AUTHORIZATION
 ===================================================== */
 
+function getCookie(event, name) {
+
+    const headers =
+        event.headers || {};
+
+    const cookieHeader =
+        headers.cookie ||
+        headers.Cookie ||
+        "";
+
+    const cookies =
+        cookieHeader
+            .split(";")
+            .map(cookie => cookie.trim());
+
+    const prefix =
+        `${name}=`;
+
+    const found =
+        cookies.find(
+            cookie =>
+                cookie.startsWith(prefix)
+        );
+
+    if (!found) {
+        return "";
+    }
+
+    try {
+
+        return decodeURIComponent(
+            found.slice(prefix.length)
+        );
+
+    } catch {
+
+        return "";
+    }
+}
+
+
 function isAuthorized(event) {
 
     const expectedToken =
@@ -42,6 +84,15 @@ function isAuthorized(event) {
         return false;
     }
 
+
+    /*
+        Method 1:
+        Authorization header
+
+        Kept for compatibility with
+        direct/API requests.
+    */
+
     const headers =
         event.headers || {};
 
@@ -50,8 +101,36 @@ function isAuthorized(event) {
         headers.Authorization ||
         "";
 
-    return authorization ===
-        `Bearer ${expectedToken}`;
+    if (
+        authorization ===
+        `Bearer ${expectedToken}`
+    ) {
+
+        return true;
+    }
+
+
+    /*
+        Method 2:
+        Secure HttpOnly CMS session cookie
+    */
+
+    const sessionToken =
+        getCookie(
+            event,
+            "cms_session"
+        );
+
+    if (
+        sessionToken ===
+        expectedToken
+    ) {
+
+        return true;
+    }
+
+
+    return false;
 }
 
 
@@ -760,6 +839,7 @@ export async function handler(
                     "Method not allowed."
             }
         );
+
 
     } catch (error) {
 
