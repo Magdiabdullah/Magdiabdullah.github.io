@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="SecurityHub — cybersecurity notes, research, labs, tools, and practical security knowledge by Magdi Saad.">
+
+    <title>SecurityHub | Magdi Saad</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+    <style>
+
+        /* =====================================================
+           SECURITYHUB
+           Additional page-only styles.
+           Existing portfolio CSS is not modified.
+        ===================================================== */
+
+        .securityhub-page {
+
+            min-height: 100vh;
+
+            padding-top: 76px;
+
+        }
+
+
+        .securityhub-hero {
+
+            padding:
+                95px 0 55px;
+
+            border-bottom:
+                1px solid
+                rgba(32,240,160,.10);
+
+        }
+
+
+        .securityhub-hero-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1.2fr .8fr;
+
+            align-items: end;
+
+            gap: 50px;
+
+        }
+
+
+        .securityhub-eyebrow {
+
+            color:
+                var(--green);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: .20em;
+
+        }
+
+
+        .securityhub-title {
+
+            margin-top: 14px;
+
+            font-size:
+                clamp(
+                    48px,
+                    7vw,
+                    82px
+                );
+
+            line-height: .92;
+
+            letter-spacing:
+                -.06em;
+
+        }
+
+
+        .securityhub-title strong {
+
+            display: block;
+
+            color:
+                var(--green);
+
+            font-weight: 800;
+
+        }
+
+
+        .securityhub-description {
+
+            max-width: 720px;
+
+            margin-top: 25px;
+
+            color:
+                var(--text);
+
+            font-size: 14px;
+
+            line-height: 1.9;
+
+        }
+
+
+        .securityhub-actions {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 28px;
+
+        }
+
+
+        .securityhub-action {
+
+            min-height: 48px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 15px;
+
+            padding:
+                0 19px;
+
+            border:
+                1px solid
+                var(--green-line);
+
+            border-radius: 4px;
+
+            background:
+                rgba(7,19,16,.72);
+
+            color:
+                var(--green);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                .25s ease;
+
+        }
+
+
+        .securityhub-action:hover {
+
+            border-color:
+                var(--green);
+
+            background:
+                var(--green-soft);
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+        .securityhub-action.primary {
+
+            background:
+                var(--green);
+
+            color:
+                #03100a;
+
+            border-color:
+                var(--green);
+
+        }
+
+
+        .securityhub-status {
+
+            align-self: center;
+
+            padding:
+                25px;
+
+            border:
+                1px solid
+                var(--green-line);
+
+            background:
+                rgba(7,18,15,.58);
+
+        }
+
+
+        .securityhub-status-label {
+
+            color:
+                var(--green);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 8px;
+
+            letter-spacing:
+                .18em;
+
+        }
+
+
+        .securityhub-status strong {
+
+            display: block;
+
+            margin-top: 10px;
+
+            font-size: 28px;
+
+        }
+
+
+        .securityhub-status p {
+
+            margin-top: 8px;
+
+            color:
+                var(--muted);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 9px;
+
+            line-height: 1.7;
+
+        }
+
+
+        /* =====================================================
+           NOTES AREA
+        ===================================================== */
+
+        .securityhub-notes {
+
+            padding:
+                75px 0 100px;
+
+        }
+
+
+        .securityhub-section-heading {
+
+            display: flex;
+
+            align-items: end;
+
+            justify-content: space-between;
+
+            gap: 30px;
+
+            margin-bottom: 35px;
+
+        }
+
+
+        .securityhub-section-heading span {
+
+            color:
+                var(--green);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: .18em;
+
+        }
+
+
+        .securityhub-section-heading h2 {
+
+            margin-top: 9px;
+
+            font-size:
+                clamp(
+                    32px,
+                    4vw,
+                    48px
+                );
+
+            line-height: 1;
+
+            letter-spacing:
+                -.05em;
+
+        }
+
+
+        .securityhub-count {
+
+            color:
+                var(--muted);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 9px;
+
+            white-space: nowrap;
+
+        }
+
+
+        /* =====================================================
+           NOTE GRID
+        ===================================================== */
+
+        .securityhub-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 12px;
+
+        }
+
+
+        .securityhub-note {
+
+            position: relative;
+
+            min-height: 285px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            padding: 28px;
+
+            border:
+                1px solid
+                var(--border);
+
+            background:
+                rgba(7,18,15,.52);
+
+            transition:
+                .25s ease;
+
+        }
+
+
+        .securityhub-note:hover {
+
+            transform:
+                translateY(-4px);
+
+            border-color:
+                var(--green-line);
+
+        }
+
+
+        .securityhub-note.featured {
+
+            grid-column:
+                1 / -1;
+
+            min-height:
+                245px;
+
+            border-color:
+                var(--green-line);
+
+        }
+
+
+        .securityhub-note-top {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            color:
+                var(--green);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 8px;
+
+            letter-spacing:
+                .13em;
+
+        }
+
+
+        .securityhub-note-category {
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+        }
+
+
+        .securityhub-note-date {
+
+            color:
+                var(--muted);
+
+            white-space: nowrap;
+
+        }
+
+
+        .securityhub-note h3 {
+
+            margin-top: 28px;
+
+            font-size: 25px;
+
+            line-height: 1.15;
+
+            letter-spacing:
+                -.025em;
+
+        }
+
+
+        .securityhub-note-excerpt {
+
+            margin-top: 13px;
+
+            color:
+                var(--text);
+
+            font-size: 13px;
+
+            line-height: 1.85;
+
+        }
+
+
+        .securityhub-note-tags {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 6px;
+
+            margin-top: 17px;
+
+        }
+
+
+        .securityhub-note-tag {
+
+            padding:
+                5px 8px;
+
+            border:
+                1px solid
+                rgba(32,240,160,.14);
+
+            background:
+                rgba(32,240,160,.025);
+
+            color:
+                #91a099;
+
+            font-size: 8px;
+
+        }
+
+
+        .securityhub-note-footer {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-top: auto;
+
+            padding-top: 25px;
+
+        }
+
+
+        .securityhub-read {
+
+            color:
+                var(--green);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing:
+                .05em;
+
+        }
+
+
+        .securityhub-read:hover {
+
+            text-decoration:
+                underline;
+
+        }
+
+
+        .securityhub-index {
+
+            color:
+                rgba(32,240,160,.35);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 9px;
+
+        }
+
+
+        /* =====================================================
+           EMPTY / ERROR / LOADING
+        ===================================================== */
+
+        .securityhub-message {
+
+            grid-column:
+                1 / -1;
+
+            padding:
+                55px 30px;
+
+            border:
+                1px solid
+                var(--green-line);
+
+            background:
+                rgba(7,18,15,.58);
+
+            text-align:
+                center;
+
+        }
+
+
+        .securityhub-message strong {
+
+            display: block;
+
+            color:
+                var(--green);
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 11px;
+
+            letter-spacing:
+                .15em;
+
+        }
+
+
+        .securityhub-message p {
+
+            margin-top: 12px;
+
+            color:
+                var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 850px) {
+
+            .securityhub-hero-grid {
+
+                grid-template-columns:
+                    1fr;
+
+                gap: 30px;
+
+            }
+
+
+            .securityhub-status {
+
+                max-width:
+                    500px;
+
+            }
+
+
+            .securityhub-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .securityhub-note.featured {
+
+                grid-column:
+                    auto;
+
+            }
+
+        }
+
+
+        @media (max-width: 620px) {
+
+            .securityhub-page {
+
+                padding-top:
+                    68px;
+
+            }
+
+
+            .securityhub-hero {
+
+                padding:
+                    70px 0 42px;
+
+            }
+
+
+            .securityhub-title {
+
+                font-size:
+                    clamp(
+                        43px,
+                        14vw,
+                        68px
+                    );
+
+            }
+
+
+            .securityhub-description {
+
+                font-size:
+                    12px;
+
+            }
+
+
+            .securityhub-actions {
+
+                flex-direction:
+                    column;
+
+            }
+
+
+            .securityhub-action {
+
+                width:
+                    100%;
+
+            }
+
+
+            .securityhub-section-heading {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
+                gap: 10px;
+
+            }
+
+
+            .securityhub-note {
+
+                padding:
+                    23px;
+
+            }
+
+
+            .securityhub-note h3 {
+
+                font-size:
+                    22px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<header class="navbar">
+
+    <div class="container nav-container">
+
+
+        <a
+            href="index.html"
+            class="brand">
+
+            <span class="brand-mark">
+                MS
+            </span>
+
+            <span class="brand-copy">
+
+                <strong>
+                    MAGDI SAAD
+                </strong>
+
+                <small>
+                    INFORMATION TECHNOLOGY
+                </small>
+
+            </span>
+
+        </a>
+
+
+        <nav
+            class="top-nav"
+            id="topNav">
+
+            <a
+                href="index.html"
+                class="top-link">
+
+                Home
+
+            </a>
+
+
+            <a
+                href="index.html#about"
+                class="top-link">
+
+                About
+
+            </a>
+
+
+            <a
+                href="securityhub.html"
+                class="top-link active">
+
+                SecurityHub
+
+            </a>
+
+
+            <a
+                href="index.html#contact"
+                class="top-link">
+
+                Contact
+
+            </a>
+
+        </nav>
+
+
+        <a
+            href="admin.html"
+            class="cv-button">
+
+            CMS ADMIN
+
+        </a>
+
+
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            aria-label="Open navigation"
+            aria-expanded="false">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="securityhub-page">
+
+
+<!-- =====================================================
+     SECURITYHUB HERO
+===================================================== -->
+
+<section class="securityhub-hero">
+
+    <div class="container securityhub-hero-grid">
+
+
+        <div>
+
+            <div class="securityhub-eyebrow">
+
+                SECURITYHUB
+                <span>•</span>
+                KNOWLEDGE
+                <span>•</span>
+                RESEARCH
+
+            </div>
+
+
+            <h1 class="securityhub-title">
+
+                SECURITY
+                <strong>NOTES</strong>
+
+            </h1>
+
+
+            <p class="securityhub-description">
+
+                Practical cybersecurity notes, research,
+                technical experiments, tools, labs, and
+                lessons learned — organized in one place.
+
+            </p>
+
+
+            <div class="securityhub-actions">
+
+                <a
+                    href="admin.html"
+                    class="securityhub-action primary">
+
+                    <span>
+                        CMS ADMIN
+                    </span>
+
+                    <b>
+                        ↗
+                    </b>
+
+                </a>
+
+
+                <button
+                    type="button"
+                    class="securityhub-action"
+                    id="refreshNotes">
+
+                    <span>
+                        REFRESH NOTES
+                    </span>
+
+                    <b>
+                        ↻
+                    </b>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="securityhub-status">
+
+            <span class="securityhub-status-label">
+
+                SYSTEM STATUS
+
+            </span>
+
+
+            <strong id="noteCount">
+                —
+            </strong>
+
+
+            <p>
+                PUBLISHED SECURITY NOTES
+                <br>
+                SOURCE: GITHUB / CMS
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     PUBLISHED NOTES
+===================================================== -->
+
+<section class="securityhub-notes">
+
+    <div class="container">
+
+
+        <div class="securityhub-section-heading">
+
+            <div>
+
+                <span>
+                    01 / KNOWLEDGE BASE
+                </span>
+
+                <h2>
+                    Latest Notes
+                </h2>
+
+            </div>
+
+
+            <div
+                class="securityhub-count"
+                id="lastUpdated">
+
+                LOADING...
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="securityhub-grid"
+            id="notesGrid">
+
+            <div class="securityhub-message">
+
+                <strong>
+                    LOADING SECURITY NOTES...
+                </strong>
+
+                <p>
+                    Connecting to the published knowledge base.
+                </p>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <div class="container footer-inner">
+
+        <div>
+
+            <strong>
+                MAGDI SAAD
+            </strong>
+
+            <small>
+                INFORMATION TECHNOLOGY / CYBERSECURITY
+            </small>
+
+        </div>
+
+
+        <a
+            href="assets/documents/CV.pdf"
+            download>
+
+            DOWNLOAD CV ↗
+
+        </a>
+
+    </div>
+
+</footer>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+
+        /* =================================================
+           MOBILE NAVIGATION
+        ================================================= */
+
+        const menuToggle =
+            document.getElementById(
+                "menuToggle"
+            );
+
+        const topNav =
+            document.getElementById(
+                "topNav"
+            );
+
+
+        if (
+            menuToggle &&
+            topNav
+        ) {
+
+            menuToggle.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    const isOpen =
+                        topNav.classList.contains(
+                            "open"
+                        );
+
+                    topNav.classList.toggle(
+                        "open"
+                    );
+
+                    menuToggle.setAttribute(
+                        "aria-expanded",
+                        String(!isOpen)
+                    );
+
+                }
+            );
+
+
+            document.addEventListener(
+                "click",
+                event => {
+
+                    if (
+                        !topNav.contains(
+                            event.target
+                        ) &&
+                        !menuToggle.contains(
+                            event.target
+                        )
+                    ) {
+
+                        topNav.classList.remove(
+                            "open"
+                        );
+
+                        menuToggle.setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           SECURITY NOTES
+        ================================================= */
+
+        const notesGrid =
+            document.getElementById(
+                "notesGrid"
+            );
+
+        const noteCount =
+            document.getElementById(
+                "noteCount"
+            );
+
+        const lastUpdated =
+            document.getElementById(
+                "lastUpdated"
+            );
+
+        const refreshButton =
+            document.getElementById(
+                "refreshNotes"
+            );
+
+
+        function escapeHTML(value) {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+            element.textContent =
+                String(value || "");
+
+            return element.innerHTML;
+
+        }
+
+
+        function formatDate(value) {
+
+            if (!value) {
+
+                return "DATE UNKNOWN";
+
+            }
+
+
+            const date =
+                new Date(value);
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return String(value);
+
+            }
+
+
+            return date.toLocaleDateString(
+                "en-US",
+                {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric"
+                }
+            );
+
+        }
+
+
+        function createTag(
+            tag
+        ) {
+
+            const element =
+                document.createElement(
+                    "span"
+                );
+
+            element.className =
+                "securityhub-note-tag";
+
+            element.textContent =
+                tag.trim();
+
+            return element;
+
+        }
+
+
+        function createNoteCard(
+            post,
+            index
+        ) {
+
+            const article =
+                document.createElement(
+                    "article"
+                );
+
+            article.className =
+                "securityhub-note";
+
+            if (index === 0) {
+
+                article.classList.add(
+                    "featured"
+                );
+
+            }
+
+
+            /* ---------------------------------------------
+               TOP
+            --------------------------------------------- */
+
+            const top =
+                document.createElement(
+                    "div"
+                );
+
+            top.className =
+                "securityhub-note-top";
+
+
+            const category =
+                document.createElement(
+                    "span"
+                );
+
+            category.className =
+                "securityhub-note-category";
+
+            category.textContent =
+                String(
+                    post.category ||
+                    "CYBERSECURITY"
+                ).toUpperCase();
+
+
+            const date =
+                document.createElement(
+                    "span"
+                );
+
+            date.className =
+                "securityhub-note-date";
+
+            date.textContent =
+                formatDate(
+                    post.date
+                );
+
+
+            top.append(
+                category,
+                date
+            );
+
+
+            /* ---------------------------------------------
+               TITLE
+            --------------------------------------------- */
+
+            const title =
+                document.createElement(
+                    "h3"
+                );
+
+            title.textContent =
+                post.title ||
+                "Untitled Note";
+
+
+            /* ---------------------------------------------
+               EXCERPT
+            --------------------------------------------- */
+
+            const excerpt =
+                document.createElement(
+                    "p"
+                );
+
+            excerpt.className =
+                "securityhub-note-excerpt";
+
+            excerpt.textContent =
+                post.excerpt ||
+                "Open this note to read the full article.";
+
+
+            /* ---------------------------------------------
+               TAGS
+            --------------------------------------------- */
+
+            const tagsContainer =
+                document.createElement(
+                    "div"
+                );
+
+            tagsContainer.className =
+                "securityhub-note-tags";
+
+
+            const rawTags =
+                String(
+                    post.tags || ""
+                )
+                .split(",")
+                .map(
+                    tag => tag.trim()
+                )
+                .filter(Boolean);
+
+
+            rawTags
+                .slice(0, 5)
+                .forEach(
+                    tag => {
+
+                        tagsContainer.append(
+                            createTag(tag)
+                        );
+
+                    }
+                );
+
+
+            /* ---------------------------------------------
+               FOOTER
+            --------------------------------------------- */
+
+            const footer =
+                document.createElement(
+                    "div"
+                );
+
+            footer.className =
+                "securityhub-note-footer";
+
+
+            const readLink =
+                document.createElement(
+                    "a"
+                );
+
+            readLink.className =
+                "securityhub-read";
+
+            readLink.textContent =
+                "READ ARTICLE ↗";
+
+
+            const articleURL =
+                String(
+                    post.url || ""
+                ).trim();
+
+
+            if (
+                articleURL &&
+                !articleURL.includes("://") &&
+                !articleURL.startsWith("//") &&
+                !articleURL.startsWith("javascript:")
+            ) {
+
+                readLink.href =
+                    articleURL;
+
+            } else {
+
+                readLink.href =
+                    "#";
+
+                readLink.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                    }
+                );
+
+            }
+
+
+            const indexLabel =
+                document.createElement(
+                    "span"
+                );
+
+            indexLabel.className =
+                "securityhub-index";
+
+            indexLabel.textContent =
+                String(
+                    index + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            footer.append(
+                readLink,
+                indexLabel
+            );
+
+
+            article.append(
+                top,
+                title,
+                excerpt
+            );
+
+
+            if (
+                rawTags.length
+            ) {
+
+                article.append(
+                    tagsContainer
+                );
+
+            }
+
+
+            article.append(
+                footer
+            );
+
+
+            return article;
+
+        }
+
+
+        function showMessage(
+            title,
+            message
+        ) {
+
+            notesGrid.innerHTML = "";
+
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+            wrapper.className =
+                "securityhub-message";
+
+
+            const heading =
+                document.createElement(
+                    "strong"
+                );
+
+            heading.textContent =
+                title;
+
+
+            const text =
+                document.createElement(
+                    "p"
+                );
+
+            text.textContent =
+                message;
+
+
+            wrapper.append(
+                heading,
+                text
+            );
+
+
+            notesGrid.append(
+                wrapper
+            );
+
+        }
+
+
+        async function loadNotes() {
+
+            showMessage(
+                "LOADING SECURITY NOTES...",
+                "Connecting to the published knowledge base."
+            );
+
+
+            if (refreshButton) {
+
+                refreshButton.disabled =
+                    true;
+
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "posts/index.json?ts=" +
+                        Date.now(),
+                        {
+                            method: "GET",
+                            cache: "no-store"
+                        }
+                    );
+
+
+                if (
+                    !response.ok
+                ) {
+
+                    throw new Error(
+                        `HTTP ${response.status}`
+                    );
+
+                }
+
+
+                const posts =
+                    await response.json();
+
+
+                if (
+                    !Array.isArray(
+                        posts
+                    )
+                ) {
+
+                    throw new Error(
+                        "Invalid notes index."
+                    );
+
+                }
+
+
+                noteCount.textContent =
+                    posts.length;
+
+
+                lastUpdated.textContent =
+                    "INDEX LOADED • " +
+                    new Date().toLocaleTimeString(
+                        "en-US",
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        }
+                    );
+
+
+                if (
+                    posts.length === 0
+                ) {
+
+                    showMessage(
+                        "NO PUBLISHED NOTES",
+                        "Publish your first note through the CMS Admin."
+                    );
+
+                    return;
+
+                }
+
+
+                notesGrid.innerHTML =
+                    "";
+
+
+                posts.forEach(
+                    (
+                        post,
+                        index
+                    ) => {
+
+                        notesGrid.append(
+                            createNoteCard(
+                                post,
+                                index
+                            )
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "SecurityHub error:",
+                    error
+                );
+
+
+                noteCount.textContent =
+                    "—";
+
+
+                lastUpdated.textContent =
+                    "CONNECTION ERROR";
+
+
+                showMessage(
+                    "COULD NOT LOAD NOTES",
+                    "The published notes index could not be loaded. Please try refreshing the page."
+                );
+
+            } finally {
+
+                if (refreshButton) {
+
+                    refreshButton.disabled =
+                        false;
+
+                }
+
+            }
+
+        }
+
+
+        if (
+            refreshButton
+        ) {
+
+            refreshButton.addEventListener(
+                "click",
+                loadNotes
+            );
+
+        }
+
+
+        loadNotes();
+
+    }
+
+);
+
+</script>
+
+
+</body>
+
+</html>
