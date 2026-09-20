@@ -1,0 +1,2282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Admin | Magdi Saad Blog</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+
+    <style>
+
+        /* =========================
+           ADMIN PAGE
+        ========================= */
+
+        body {
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(0, 255, 140, 0.06),
+                    transparent 35%
+                ),
+                #050806;
+
+            color: #e8f5ed;
+            min-height: 100vh;
+        }
+
+
+        .admin-wrapper {
+            width: min(1200px, 92%);
+            margin: 50px auto 100px;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+
+            border-bottom:
+                1px solid rgba(0, 255, 140, 0.15);
+        }
+
+
+        .admin-brand {
+            color: #00ff88;
+
+            font-family: monospace;
+            font-size: 14px;
+
+            letter-spacing: 2px;
+        }
+
+
+        .admin-header h1 {
+            margin: 8px 0 0;
+
+            font-size: 34px;
+            color: #ffffff;
+        }
+
+
+        .admin-header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+
+        .admin-btn {
+            border:
+                1px solid rgba(0, 255, 140, 0.35);
+
+            background:
+                rgba(0, 255, 140, 0.05);
+
+            color: #00ff88;
+
+            padding: 11px 16px;
+
+            border-radius: 6px;
+
+            font-size: 13px;
+
+            transition: 0.2s ease;
+        }
+
+
+        .admin-btn:hover {
+            background:
+                rgba(0, 255, 140, 0.12);
+
+            border-color:
+                #00ff88;
+        }
+
+
+        .admin-btn.primary {
+            background: #00ff88;
+
+            color: #041008;
+
+            border-color: #00ff88;
+
+            font-weight: bold;
+        }
+
+
+        .admin-btn.primary:hover {
+            background: #66ffb0;
+        }
+
+
+        .admin-btn.danger {
+            color: #ff7373;
+
+            border-color:
+                rgba(255, 80, 80, 0.35);
+        }
+
+
+        .admin-btn.danger:hover {
+            background:
+                rgba(255, 80, 80, 0.1);
+
+            border-color:
+                #ff7373;
+        }
+
+
+        /* =========================
+           NOTE INFORMATION
+        ========================= */
+
+        .note-info {
+            display: grid;
+
+            grid-template-columns:
+                2fr 1fr 1fr;
+
+            gap: 15px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .field {
+            display: flex;
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+
+        .field label {
+            font-family: monospace;
+
+            font-size: 12px;
+
+            color: #7fa88e;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+
+        .field input,
+        .field select {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            background: #0a110d;
+
+            color: #ffffff;
+
+            border:
+                1px solid rgba(0, 255, 140, 0.18);
+
+            border-radius: 6px;
+
+            padding: 13px 14px;
+
+            outline: none;
+
+            font-size: 14px;
+        }
+
+
+        .field input:focus,
+        .field select:focus {
+
+            border-color: #00ff88;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(0, 255, 140, 0.06);
+        }
+
+
+        /* =========================
+           EDITOR
+        ========================= */
+
+        .editor-container {
+
+            background:
+                rgba(5, 12, 8, 0.9);
+
+            border:
+                1px solid rgba(0, 255, 140, 0.15);
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+
+        .editor-toolbar {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+
+            padding: 12px;
+
+            background: #08100b;
+
+            border-bottom:
+                1px solid rgba(0, 255, 140, 0.12);
+        }
+
+
+        .toolbar-btn {
+
+            background: transparent;
+
+            color: #00ff88;
+
+            border:
+                1px solid rgba(0, 255, 140, 0.22);
+
+            padding: 9px 13px;
+
+            border-radius: 5px;
+
+            font-family: monospace;
+
+            font-size: 12px;
+
+            transition: 0.2s ease;
+        }
+
+
+        .toolbar-btn:hover {
+
+            background:
+                rgba(0, 255, 140, 0.08);
+
+            border-color:
+                #00ff88;
+        }
+
+
+        .toolbar-separator {
+
+            width: 1px;
+
+            height: 25px;
+
+            background:
+                rgba(0, 255, 140, 0.15);
+
+            margin: 0 5px;
+        }
+
+
+        .editor-status {
+
+            margin-left: auto;
+
+            color: #557061;
+
+            font-family: monospace;
+
+            font-size: 11px;
+        }
+
+
+        /* =========================
+           ARTICLE CONTENT
+        ========================= */
+
+        .article-content {
+
+            min-height: 550px;
+
+            padding: 35px;
+
+            outline: none;
+
+            font-size: 17px;
+
+            line-height: 1.8;
+
+            color: #d9e8de;
+        }
+
+
+        .article-content:empty::before {
+
+            content:
+                "Start writing your security note...";
+
+            color: #466052;
+
+            pointer-events: none;
+        }
+
+
+        .article-content p {
+
+            margin:
+                0 0 20px;
+        }
+
+
+        .article-content h2 {
+
+            color: #ffffff;
+
+            margin-top: 30px;
+        }
+
+
+        .article-content h3 {
+
+            color: #ffffff;
+
+            margin-top: 25px;
+        }
+
+
+        /* =========================
+           IMAGES
+        ========================= */
+
+        .article-content figure {
+
+            margin:
+                30px auto;
+
+            text-align: center;
+        }
+
+
+        .article-content figure img {
+
+            max-width: 100%;
+
+            height: auto;
+
+            display: block;
+
+            margin: 0 auto;
+
+            border-radius: 8px;
+
+            border:
+                1px solid
+                rgba(0, 255, 140, 0.15);
+        }
+
+
+        .article-content figcaption {
+
+            margin-top: 9px;
+
+            color: #6f8c7b;
+
+            font-size: 13px;
+
+            font-style: italic;
+        }
+
+
+        /* =========================
+           CODE
+        ========================= */
+
+        .article-content pre,
+        .preview-article pre {
+
+            background: #020503;
+
+            border:
+                1px solid
+                rgba(0, 255, 140, 0.18);
+
+            border-left:
+                3px solid #00ff88;
+
+            border-radius: 6px;
+
+            padding: 20px;
+
+            margin: 25px 0;
+
+            overflow-x: auto;
+
+            color: #9dffca;
+
+            font-family:
+                "Courier New",
+                monospace;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            white-space: pre-wrap;
+        }
+
+
+        .article-content code,
+        .preview-article code {
+
+            font-family:
+                "Courier New",
+                monospace;
+        }
+
+
+        /* =========================
+           BOTTOM ACTIONS
+        ========================= */
+
+        .editor-actions {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            margin-top: 20px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .left-actions,
+        .right-actions {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .draft-info {
+
+            color: #5e7868;
+
+            font-family: monospace;
+
+            font-size: 11px;
+        }
+
+
+        /* =========================
+           PREVIEW
+        ========================= */
+
+        .preview-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 1000;
+
+            background:
+                rgba(0, 0, 0, 0.88);
+
+            overflow-y: auto;
+
+            padding: 40px 20px;
+        }
+
+
+        .preview-overlay.active {
+
+            display: block;
+        }
+
+
+        .preview-window {
+
+            width:
+                min(900px, 95%);
+
+            margin: auto;
+
+            background: #07100a;
+
+            border:
+                1px solid
+                rgba(0, 255, 140, 0.2);
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+
+        .preview-header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            padding: 15px 20px;
+
+            border-bottom:
+                1px solid
+                rgba(0, 255, 140, 0.12);
+
+            background: #09140d;
+        }
+
+
+        .preview-label {
+
+            color: #00ff88;
+
+            font-family: monospace;
+
+            font-size: 12px;
+
+            letter-spacing: 1px;
+        }
+
+
+        .preview-body {
+
+            padding: 40px;
+        }
+
+
+        .preview-title {
+
+            color: #ffffff;
+
+            font-size: 38px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .preview-meta {
+
+            color: #6f8c7b;
+
+            font-family: monospace;
+
+            font-size: 12px;
+
+            margin-bottom: 35px;
+        }
+
+
+        .preview-article {
+
+            color: #d9e8de;
+
+            font-size: 17px;
+
+            line-height: 1.8;
+        }
+
+
+        .preview-article p {
+
+            margin-bottom: 20px;
+        }
+
+
+        .preview-article figure {
+
+            margin: 30px auto;
+
+            text-align: center;
+        }
+
+
+        .preview-article img {
+
+            max-width: 100%;
+
+            height: auto;
+
+            border-radius: 8px;
+
+            display: block;
+
+            margin: auto;
+        }
+
+
+        .preview-article figcaption {
+
+            color: #6f8c7b;
+
+            font-size: 13px;
+
+            margin-top: 8px;
+        }
+
+
+        /* =========================
+           IMAGE DIALOG
+        ========================= */
+
+        .dialog-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 2000;
+
+            background:
+                rgba(0, 0, 0, 0.8);
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+
+        .dialog-overlay.active {
+
+            display: flex;
+        }
+
+
+        .dialog {
+
+            width:
+                min(500px, 95%);
+
+            background: #08110b;
+
+            border:
+                1px solid
+                rgba(0, 255, 140, 0.2);
+
+            border-radius: 10px;
+
+            padding: 25px;
+        }
+
+
+        .dialog h3 {
+
+            margin-top: 0;
+
+            color: #ffffff;
+        }
+
+
+        .dialog-field {
+
+            margin-bottom: 18px;
+        }
+
+
+        .dialog-field label {
+
+            display: block;
+
+            color: #7fa88e;
+
+            font-family: monospace;
+
+            font-size: 12px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .dialog-field input {
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 12px;
+
+            background: #050806;
+
+            color: #ffffff;
+
+            border:
+                1px solid
+                rgba(0, 255, 140, 0.18);
+
+            border-radius: 5px;
+        }
+
+
+        .dialog-actions {
+
+            display: flex;
+
+            justify-content:
+                flex-end;
+
+            gap: 10px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .note-info {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .admin-header {
+
+                flex-direction: column;
+
+                align-items:
+                    flex-start;
+            }
+
+
+            .article-content {
+
+                padding: 22px;
+            }
+
+
+            .preview-body {
+
+                padding: 25px;
+            }
+
+
+            .preview-title {
+
+                font-size: 30px;
+            }
+
+
+            .editor-status {
+
+                width: 100%;
+
+                margin-left: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="admin-wrapper">
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header class="admin-header">
+
+        <div>
+
+            <div class="admin-brand">
+                MAGDI / SECURITY BLOG
+            </div>
+
+            <h1>
+                Note Editor
+            </h1>
+
+        </div>
+
+
+        <div class="admin-header-actions">
+
+            <button
+                class="admin-btn"
+                onclick="loadDraft()">
+
+                LOAD DRAFT
+
+            </button>
+
+
+            <button
+                class="admin-btn danger"
+                onclick="newNote()">
+
+                + NEW NOTE
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         NOTE INFORMATION
+    ========================= -->
+
+    <section class="note-info">
+
+
+        <div class="field">
+
+            <label for="noteTitle">
+                Note Title
+            </label>
+
+
+            <input
+                type="text"
+                id="noteTitle"
+                placeholder="e.g. Understanding TCP Three-Way Handshake">
+
+        </div>
+
+
+
+        <div class="field">
+
+            <label for="noteCategory">
+                Category
+            </label>
+
+
+            <select id="noteCategory">
+
+                <option value="">
+                    Select category
+                </option>
+
+                <option value="Networking">
+                    Networking
+                </option>
+
+                <option value="Linux">
+                    Linux
+                </option>
+
+                <option value="Web Security">
+                    Web Security
+                </option>
+
+                <option value="Cybersecurity">
+                    Cybersecurity
+                </option>
+
+                <option value="SOC">
+                    SOC
+                </option>
+
+                <option value="Digital Forensics">
+                    Digital Forensics
+                </option>
+
+                <option value="Cloud Security">
+                    Cloud Security
+                </option>
+
+                <option value="Programming">
+                    Programming
+                </option>
+
+                <option value="Research">
+                    Research
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <div class="field">
+
+            <label for="noteTags">
+                Tags
+            </label>
+
+
+            <input
+                type="text"
+                id="noteTags"
+                placeholder="TCP, Wireshark, Networking">
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         EDITOR
+    ========================= -->
+
+    <section class="editor-container">
+
+
+        <div class="editor-toolbar">
+
+
+            <button
+                class="toolbar-btn"
+                onclick="addText()">
+
+                + TEXT
+
+            </button>
+
+
+            <button
+                class="toolbar-btn"
+                onclick="openImageDialog()">
+
+                + IMAGE
+
+            </button>
+
+
+            <button
+                class="toolbar-btn"
+                onclick="addCode()">
+
+                + CODE
+
+            </button>
+
+
+            <div class="toolbar-separator"></div>
+
+
+            <button
+                class="toolbar-btn"
+                onclick="formatText('bold')">
+
+                B
+
+            </button>
+
+
+            <button
+                class="toolbar-btn"
+                onclick="formatText('italic')">
+
+                I
+
+            </button>
+
+
+            <button
+                class="toolbar-btn"
+                onclick="formatText('underline')">
+
+                U
+
+            </button>
+
+
+            <div
+                class="editor-status"
+                id="editorStatus">
+
+                AUTO-SAVE ENABLED
+
+            </div>
+
+        </div>
+
+
+
+        <article
+            id="articleContent"
+            class="article-content"
+            contenteditable="true">
+        </article>
+
+    </section>
+
+
+
+    <!-- =========================
+         ACTIONS
+    ========================= -->
+
+    <div class="editor-actions">
+
+
+        <div class="left-actions">
+
+
+            <button
+                class="admin-btn"
+                onclick="saveDraft()">
+
+                SAVE DRAFT
+
+            </button>
+
+
+            <button
+                class="admin-btn"
+                onclick="showPreview()">
+
+                PREVIEW
+
+            </button>
+
+        </div>
+
+
+
+        <div class="right-actions">
+
+
+            <span
+                class="draft-info"
+                id="draftInfo">
+
+                Changes are automatically saved
+
+            </span>
+
+
+            <button
+                class="admin-btn primary"
+                onclick="publishNote()">
+
+                PUBLISH NOTE
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     IMAGE DIALOG
+========================= -->
+
+<div
+    class="dialog-overlay"
+    id="imageDialog">
+
+
+    <div class="dialog">
+
+
+        <h3>
+            Insert Image
+        </h3>
+
+
+
+        <div class="dialog-field">
+
+            <label>
+                IMAGE
+            </label>
+
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*">
+
+        </div>
+
+
+
+        <div class="dialog-field">
+
+            <label>
+                CAPTION
+            </label>
+
+
+            <input
+                type="text"
+                id="imageCaption"
+                placeholder="Optional image caption">
+
+        </div>
+
+
+
+        <div class="dialog-actions">
+
+
+            <button
+                class="admin-btn"
+                onclick="closeImageDialog()">
+
+                CANCEL
+
+            </button>
+
+
+            <button
+                class="admin-btn primary"
+                onclick="insertImage()">
+
+                INSERT IMAGE
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     PREVIEW
+========================= -->
+
+<div
+    class="preview-overlay"
+    id="preview">
+
+
+    <div class="preview-window">
+
+
+        <div class="preview-header">
+
+
+            <span class="preview-label">
+                ARTICLE PREVIEW
+            </span>
+
+
+            <button
+                class="admin-btn"
+                onclick="closePreview()">
+
+                CLOSE
+
+            </button>
+
+        </div>
+
+
+
+        <div class="preview-body">
+
+
+            <h1
+                id="previewTitle"
+                class="preview-title">
+            </h1>
+
+
+            <div
+                id="previewMeta"
+                class="preview-meta">
+            </div>
+
+
+            <article
+                id="previewArticle"
+                class="preview-article">
+            </article>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const articleContent =
+    document.getElementById("articleContent");
+
+const titleInput =
+    document.getElementById("noteTitle");
+
+const categoryInput =
+    document.getElementById("noteCategory");
+
+const tagsInput =
+    document.getElementById("noteTags");
+
+const preview =
+    document.getElementById("preview");
+
+const previewArticle =
+    document.getElementById("previewArticle");
+
+const previewTitle =
+    document.getElementById("previewTitle");
+
+const previewMeta =
+    document.getElementById("previewMeta");
+
+const imageDialog =
+    document.getElementById("imageDialog");
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const imageCaption =
+    document.getElementById("imageCaption");
+
+const editorStatus =
+    document.getElementById("editorStatus");
+
+const draftInfo =
+    document.getElementById("draftInfo");
+
+
+
+/* =====================================================
+   DRAFT STORAGE
+===================================================== */
+
+const DRAFT_KEY =
+    "magdi_blog_current_draft";
+
+
+
+/* =====================================================
+   GET DRAFT DATA
+===================================================== */
+
+function getDraftData() {
+
+    return {
+
+        title:
+            titleInput.value,
+
+        category:
+            categoryInput.value,
+
+        tags:
+            tagsInput.value,
+
+        content:
+            articleContent.innerHTML,
+
+        savedAt:
+            new Date().toISOString()
+
+    };
+
+}
+
+
+
+/* =====================================================
+   SAVE DRAFT
+===================================================== */
+
+function saveDraft() {
+
+    const draft =
+        getDraftData();
+
+
+    localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify(draft)
+    );
+
+
+    updateSaveStatus(
+        "DRAFT SAVED"
+    );
+
+}
+
+
+
+/* =====================================================
+   AUTO SAVE
+===================================================== */
+
+function autoSaveDraft() {
+
+    const draft =
+        getDraftData();
+
+
+    localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify(draft)
+    );
+
+
+    updateSaveStatus(
+        "AUTO-SAVED"
+    );
+
+}
+
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function updateSaveStatus(message) {
+
+    editorStatus.textContent =
+        message;
+
+    draftInfo.textContent =
+        message;
+
+
+    setTimeout(() => {
+
+        editorStatus.textContent =
+            "AUTO-SAVE ENABLED";
+
+        draftInfo.textContent =
+            "Changes are automatically saved";
+
+    }, 2500);
+
+}
+
+
+
+/* =====================================================
+   LOAD DRAFT
+===================================================== */
+
+function loadDraft() {
+
+    const saved =
+        localStorage.getItem(
+            DRAFT_KEY
+        );
+
+
+    if (!saved) {
+
+        alert(
+            "No saved draft was found."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const draft =
+            JSON.parse(saved);
+
+
+        titleInput.value =
+            draft.title || "";
+
+
+        categoryInput.value =
+            draft.category || "";
+
+
+        tagsInput.value =
+            draft.tags || "";
+
+
+        articleContent.innerHTML =
+            draft.content || "";
+
+
+        updateSaveStatus(
+            "DRAFT RESTORED"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "The saved draft could not be restored."
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   AUTO SAVE EVERY 10 SECONDS
+===================================================== */
+
+setInterval(
+    autoSaveDraft,
+    10000
+);
+
+
+
+/* =====================================================
+   ADD TEXT
+===================================================== */
+
+function addText() {
+
+    articleContent.focus();
+
+
+    const html = `
+        <p>
+            Write your text here...
+        </p>
+    `;
+
+
+    document.execCommand(
+        "insertHTML",
+        false,
+        html
+    );
+
+
+    autoSaveDraft();
+
+}
+
+
+
+/* =====================================================
+   TEXT FORMATTING
+===================================================== */
+
+function formatText(command) {
+
+    articleContent.focus();
+
+
+    document.execCommand(
+        command,
+        false,
+        null
+    );
+
+
+    autoSaveDraft();
+
+}
+
+
+
+/* =====================================================
+   IMAGE DIALOG
+===================================================== */
+
+function openImageDialog() {
+
+    imageInput.value = "";
+
+    imageCaption.value = "";
+
+
+    imageDialog.classList.add(
+        "active"
+    );
+
+}
+
+
+
+function closeImageDialog() {
+
+    imageDialog.classList.remove(
+        "active"
+    );
+
+}
+
+
+
+/* =====================================================
+   INSERT IMAGE
+===================================================== */
+
+function insertImage() {
+
+    const file =
+        imageInput.files[0];
+
+
+    if (!file) {
+
+        alert(
+            "Please select an image."
+        );
+
+        return;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(event) {
+
+
+            const imageURL =
+                event.target.result;
+
+
+            const caption =
+                imageCaption.value.trim();
+
+
+            let captionHTML =
+                "";
+
+
+            if (caption) {
+
+                captionHTML = `
+                    <figcaption>
+                        ${escapeHTML(caption)}
+                    </figcaption>
+                `;
+
+            }
+
+
+            const imageHTML = `
+
+                <figure class="article-image">
+
+                    <img
+                        src="${imageURL}"
+                        alt="${escapeHTML(
+                            caption ||
+                            "Blog image"
+                        )}">
+
+                    ${captionHTML}
+
+                </figure>
+
+                <p><br></p>
+
+            `;
+
+
+            articleContent.focus();
+
+
+            document.execCommand(
+                "insertHTML",
+                false,
+                imageHTML
+            );
+
+
+            closeImageDialog();
+
+
+            autoSaveDraft();
+
+        };
+
+
+    reader.readAsDataURL(file);
+
+}
+
+
+
+/* =====================================================
+   ADD CODE
+===================================================== */
+
+function addCode() {
+
+    articleContent.focus();
+
+
+    const codeHTML = `
+
+        <pre class="code-block"><code>// Write your code here...</code></pre>
+
+        <p><br></p>
+
+    `;
+
+
+    document.execCommand(
+        "insertHTML",
+        false,
+        codeHTML
+    );
+
+
+    autoSaveDraft();
+
+}
+
+
+
+/* =====================================================
+   PREVIEW
+===================================================== */
+
+function showPreview() {
+
+    previewTitle.textContent =
+        titleInput.value ||
+        "Untitled Note";
+
+
+    const category =
+        categoryInput.value ||
+        "Uncategorized";
+
+
+    const tags =
+        tagsInput.value ||
+        "";
+
+
+    const date =
+        new Date().toLocaleDateString(
+            "en-US",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+
+    previewMeta.textContent =
+        `${category} • ${date}` +
+        (
+            tags
+                ? ` • ${tags}`
+                : ""
+        );
+
+
+    previewArticle.innerHTML =
+        articleContent.innerHTML;
+
+
+    preview.classList.add(
+        "active"
+    );
+
+}
+
+
+
+function closePreview() {
+
+    preview.classList.remove(
+        "active"
+    );
+
+}
+
+
+
+/* =====================================================
+   NEW NOTE
+===================================================== */
+
+function newNote() {
+
+    const hasContent =
+        titleInput.value.trim() ||
+        categoryInput.value.trim() ||
+        tagsInput.value.trim() ||
+        articleContent.innerText.trim();
+
+
+    if (hasContent) {
+
+        const confirmNew =
+            confirm(
+
+                "Start a new note?\n\n" +
+
+                "Your current article is already " +
+
+                "saved as a draft.\n\n" +
+
+                "The current editor will be cleared."
+
+            );
+
+
+        if (!confirmNew) {
+
+            return;
+
+        }
+
+    }
+
+
+    titleInput.value = "";
+
+    categoryInput.value = "";
+
+    tagsInput.value = "";
+
+    articleContent.innerHTML = "";
+
+
+    preview.classList.remove(
+        "active"
+    );
+
+
+    updateSaveStatus(
+        "NEW NOTE"
+    );
+
+
+    articleContent.focus();
+
+}
+
+
+
+/* =====================================================
+   PUBLISH NOTE
+===================================================== */
+
+async function publishNote() {
+
+
+    /* -----------------------------------------------
+       Check title
+    ------------------------------------------------ */
+
+    const title =
+        titleInput.value.trim();
+
+
+    if (!title) {
+
+        alert(
+            "Please enter a title before publishing."
+        );
+
+
+        titleInput.focus();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       Check content
+    ------------------------------------------------ */
+
+    const content =
+        articleContent.innerHTML.trim();
+
+
+    if (!content) {
+
+        alert(
+            "Please write some content before publishing."
+        );
+
+
+        articleContent.focus();
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       Confirm
+    ------------------------------------------------ */
+
+    const confirmed =
+        confirm(
+
+            `Publish "${title}"?\n\n` +
+
+            "This will create the article in your blog."
+
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------
+       Safety backup
+    ------------------------------------------------ */
+
+    autoSaveDraft();
+
+
+    /* -----------------------------------------------
+       Update status
+    ------------------------------------------------ */
+
+    editorStatus.textContent =
+        "PUBLISHING...";
+
+
+    draftInfo.textContent =
+        "Sending article to GitHub...";
+
+
+    /* -----------------------------------------------
+       Prepare data
+    ------------------------------------------------ */
+
+    const articleData = {
+
+        title:
+            title,
+
+        category:
+            categoryInput.value.trim(),
+
+        tags:
+            tagsInput.value.trim(),
+
+        content:
+            content
+
+    };
+
+
+    try {
+
+
+        /* -------------------------------------------
+           Send to Netlify Function
+        -------------------------------------------- */
+
+        const response =
+            await fetch(
+
+                "/.netlify/functions/publish-note",
+
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            articleData
+                        )
+
+                }
+
+            );
+
+
+        /* -------------------------------------------
+           Read server response
+        -------------------------------------------- */
+
+        const result =
+            await response.json();
+
+
+        /* -------------------------------------------
+           Handle failure
+        -------------------------------------------- */
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+
+                result.message ||
+
+                "Publishing failed."
+
+            );
+
+        }
+
+
+        /* -------------------------------------------
+           Success
+        -------------------------------------------- */
+
+        editorStatus.textContent =
+            "PUBLISHED";
+
+
+        draftInfo.textContent =
+            "Article published successfully";
+
+
+        console.log(
+            "Published article:",
+            result
+        );
+
+
+        alert(
+
+            "Article published successfully!\n\n" +
+
+            "GitHub has received the article."
+
+        );
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Publishing error:",
+            error
+        );
+
+
+        /* -------------------------------------------
+           IMPORTANT:
+
+           The local draft remains safe.
+        -------------------------------------------- */
+
+        editorStatus.textContent =
+            "PUBLISH FAILED";
+
+
+        draftInfo.textContent =
+            "Your draft is still safely saved";
+
+
+        alert(
+
+            "Publishing failed.\n\n" +
+
+            "Your article is still saved as a local draft.\n\n" +
+
+            "Error: " +
+
+            error.message
+
+        );
+
+    }
+
+}
+
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        text;
+
+
+    return div.innerHTML;
+
+}
+
+
+
+/* =====================================================
+   RESTORE DRAFT ON PAGE LOAD
+===================================================== */
+
+window.addEventListener(
+    "load",
+    function() {
+
+
+        const saved =
+            localStorage.getItem(
+                DRAFT_KEY
+            );
+
+
+        if (!saved) {
+
+            return;
+
+        }
+
+
+        const restore =
+            confirm(
+
+                "A saved draft was found.\n\n" +
+
+                "Do you want to restore it?"
+
+            );
+
+
+        if (restore) {
+
+            loadDraft();
+
+        }
+
+    }
+);
+
+
+
+/* =====================================================
+   SAVE BEFORE PAGE CLOSE
+===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        autoSaveDraft();
+
+    }
+);
+
+
+
+/* =====================================================
+   SAVE WHILE TYPING
+===================================================== */
+
+let typingTimer;
+
+
+articleContent.addEventListener(
+    "input",
+    function() {
+
+
+        clearTimeout(
+            typingTimer
+        );
+
+
+        typingTimer =
+            setTimeout(
+                autoSaveDraft,
+                1000
+            );
+
+    }
+);
+
+
+
+titleInput.addEventListener(
+    "input",
+    function() {
+
+
+        clearTimeout(
+            typingTimer
+        );
+
+
+        typingTimer =
+            setTimeout(
+                autoSaveDraft,
+                1000
+            );
+
+    }
+);
+
+
+
+categoryInput.addEventListener(
+    "change",
+    function() {
+
+        autoSaveDraft();
+
+    }
+);
+
+
+
+tagsInput.addEventListener(
+    "input",
+    function() {
+
+
+        clearTimeout(
+            typingTimer
+        );
+
+
+        typingTimer =
+            setTimeout(
+                autoSaveDraft,
+                1000
+            );
+
+    }
+);
+
+
+
+/* =====================================================
+   CLOSE IMAGE DIALOG OUTSIDE CLICK
+===================================================== */
+
+imageDialog.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target ===
+            imageDialog
+        ) {
+
+            closeImageDialog();
+
+        }
+
+    }
+);
+
+
+
+/* =====================================================
+   ESC KEY
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeImageDialog();
+
+            closePreview();
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>
