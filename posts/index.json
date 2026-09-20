@@ -1,5 +1,14 @@
 [
   {
+    "slug": "web-application-security-understanding-how-web-attacks-work",
+    "title": "Web Application Security: Understanding How Web Attacks Work",
+    "category": "Web Security",
+    "tags": "web security, HTTP, OWASP, XSS, SQL injection, authentication",
+    "date": "2026-09-20",
+    "excerpt": "What Is Web Application Security? Web application security is the practice of protecting websites, APIs, and web services from attacks and vulnerabilities. Modern applications proc...",
+    "url": "posts/web-application-security-understanding-how-web-attacks-work.html"
+  },
+  {
     "slug": "understanding-cybersecurity-the-digital-security-landscape",
     "title": "Understanding Cybersecurity: The Digital Security Landscape",
     "category": "Cybersecurity",
