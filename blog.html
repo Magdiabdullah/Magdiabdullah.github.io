@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Blog | Magdi Saad</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .blog-page {
+            min-height: 100vh;
+            padding: 140px 7% 80px;
+            background: #020807;
+        }
+
+        .blog-header {
+            max-width: 900px;
+            margin-bottom: 60px;
+        }
+
+        .blog-label {
+            color: #00ff9d;
+            font-size: 13px;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .blog-header h1 {
+            font-size: clamp(42px, 6vw, 78px);
+            line-height: 1;
+            margin-bottom: 25px;
+            color: #f5f5f5;
+        }
+
+        .blog-header p {
+            max-width: 720px;
+            color: #a6aaa8;
+            font-size: 17px;
+            line-height: 1.8;
+        }
+
+        .blog-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 45px;
+        }
+
+        .blog-category {
+            padding: 10px 18px;
+            border: 1px solid rgba(0, 255, 157, 0.25);
+            background: rgba(0, 255, 157, 0.03);
+            color: #b8bfbc;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .blog-category:hover,
+        .blog-category.active {
+            background: #00ff9d;
+            color: #02100b;
+            border-color: #00ff9d;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .blog-card {
+            border: 1px solid rgba(0, 255, 157, 0.18);
+            background: rgba(0, 20, 14, 0.45);
+            padding: 28px;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s ease;
+        }
+
+        .blog-card:hover {
+            border-color: rgba(0, 255, 157, 0.55);
+            transform: translateY(-4px);
+        }
+
+        .blog-card-category {
+            color: #00ff9d;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 22px;
+        }
+
+        .blog-card h2 {
+            color: #f5f5f5;
+            font-size: 24px;
+            line-height: 1.25;
+            margin-bottom: 15px;
+        }
+
+        .blog-card p {
+            color: #929996;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .blog-card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 255, 157, 0.1);
+        }
+
+        .blog-date {
+            color: #626966;
+            font-size: 11px;
+        }
+
+        .read-note {
+            color: #00ff9d;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .read-note:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading / Empty / Error */
+
+        .blog-status {
+            grid-column: 1 / -1;
+            padding: 60px 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 157, 0.12);
+            background: rgba(0, 20, 14, 0.25);
+            color: #737b77;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .blog-status.error {
+            color: #ff7777;
+            border-color: rgba(255, 80, 80, 0.2);
+        }
+
+        @media (max-width: 900px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .blog-page {
+                padding: 110px 5% 60px;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .blog-header h1 {
+                font-size: 46px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="blog-page">
+
+        <header class="blog-header">
+
+            <div class="blog-label">
+                PERSONAL BLOG / LEARNING NOTES
+            </div>
+
+            <h1>Security Notes.</h1>
+
+            <p>
+                A collection of my technical notes, experiments, research,
+                and lessons learned while studying cybersecurity and
+                information technology.
+            </p>
+
+        </header>
+
+
+        <div class="blog-categories">
+
+            <button class="blog-category active" data-category="All">
+                All
+            </button>
+
+            <button class="blog-category" data-category="Cybersecurity">
+                Cybersecurity
+            </button>
+
+            <button class="blog-category" data-category="Networking">
+                Networking
+            </button>
+
+            <button class="blog-category" data-category="Linux">
+                Linux
+            </button>
+
+            <button class="blog-category" data-category="Web Security">
+                Web Security
+            </button>
+
+            <button class="blog-category" data-category="Research">
+                Research
+            </button>
+
+            <button class="blog-category" data-category="Tools">
+                Tools
+            </button>
+
+        </div>
+
+
+        <section class="blog-grid" id="blogGrid">
+
+            <div class="blog-status" id="blogStatus">
+                Loading security notes...
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        const blogGrid = document.getElementById("blogGrid");
+        const blogStatus = document.getElementById("blogStatus");
+        const categoryButtons = document.querySelectorAll(".blog-category");
+
+        let allPosts = [];
+
+
+        /*
+         * Load published notes
+         */
+
+        async function loadPosts() {
+
+            try {
+
+                const response = await fetch("posts/index.json", {
+                    cache: "no-cache"
+                });
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Failed to load posts: ${response.status}`
+                    );
+                }
+
+                const data = await response.json();
+
+                allPosts = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data.posts)
+                        ? data.posts
+                        : [];
+
+                renderPosts(allPosts);
+
+            } catch (error) {
+
+                console.error("Blog loading error:", error);
+
+                blogGrid.innerHTML = `
+                    <div class="blog-status error">
+                        Unable to load security notes right now.
+                    </div>
+                `;
+
+            }
+
+        }
+
+
+        /*
+         * Render blog cards
+         */
+
+        function renderPosts(posts) {
+
+            if (!posts.length) {
+
+                blogGrid.innerHTML = `
+                    <div class="blog-status">
+                        No published notes yet.
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            blogGrid.innerHTML = "";
+
+
+            posts.forEach(post => {
+
+                const card = document.createElement("article");
+
+                card.className = "blog-card";
+
+
+                const category = escapeHTML(
+                    post.category || "Cybersecurity"
+                );
+
+
+                const title = escapeHTML(
+                    post.title || "Untitled Note"
+                );
+
+
+                const excerpt = escapeHTML(
+                    post.excerpt || "Technical notes and learning observations."
+                );
+
+
+                const date = formatDate(post.date);
+
+
+                const url = sanitizeURL(
+                    post.url || `posts/${post.slug}.html`
+                );
+
+
+                card.innerHTML = `
+
+                    <div class="blog-card-category">
+                        ${category}
+                    </div>
+
+                    <h2>
+                        ${title}
+                    </h2>
+
+                    <p>
+                        ${excerpt}
+                    </p>
+
+                    <div class="blog-card-footer">
+
+                        <span class="blog-date">
+                            ${date}
+                        </span>
+
+                        <a
+                            href="${url}"
+                            class="read-note"
+                        >
+                            Read Note →
+                        </a>
+
+                    </div>
+
+                `;
+
+
+                blogGrid.appendChild(card);
+
+            });
+
+        }
+
+
+        /*
+         * Category filtering
+         */
+
+        categoryButtons.forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                categoryButtons.forEach(item => {
+                    item.classList.remove("active");
+                });
+
+                button.classList.add("active");
+
+
+                const selectedCategory =
+                    button.dataset.category;
+
+
+                if (selectedCategory === "All") {
+
+                    renderPosts(allPosts);
+
+                    return;
+                }
+
+
+                const filteredPosts = allPosts.filter(post => {
+
+                    return String(
+                        post.category || ""
+                    ).toLowerCase() ===
+                    selectedCategory.toLowerCase();
+
+                });
+
+
+                renderPosts(filteredPosts);
+
+            });
+
+        });
+
+
+        /*
+         * Date formatting
+         */
+
+        function formatDate(dateString) {
+
+            if (!dateString) {
+                return "Unknown date";
+            }
+
+
+            const date = new Date(dateString);
+
+
+            if (Number.isNaN(date.getTime())) {
+                return escapeHTML(dateString);
+            }
+
+
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            });
+
+        }
+
+
+        /*
+         * Basic HTML escaping
+         */
+
+        function escapeHTML(value) {
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        /*
+         * Prevent javascript: URLs from being inserted
+         */
+
+        function sanitizeURL(url) {
+
+            const value = String(url || "").trim();
+
+
+            if (
+                value.toLowerCase().startsWith("javascript:")
+                ||
+                value.toLowerCase().startsWith("data:")
+            ) {
+                return "#";
+            }
+
+
+            return value;
+
+        }
+
+
+        /*
+         * Start blog
+         */
+
+        loadPosts();
+
+    </script>
+
+</body>
+</html>
