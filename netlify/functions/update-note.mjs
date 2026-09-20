@@ -899,7 +899,7 @@ async function savePostsIndex(
    MAIN FUNCTION
 ===================================================== */
 
-export default async (request) {
+export default async (request) => {
 
     /*
         Protect note loading and updating
