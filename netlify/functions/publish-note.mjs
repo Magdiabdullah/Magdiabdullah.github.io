@@ -1,7 +1,13 @@
 const GITHUB_API = "https://api.github.com";
 const BRANCH = "main";
 
+
+/* =====================================================
+   JSON RESPONSE
+===================================================== */
+
 function jsonResponse(data, status = 200) {
+
     return new Response(
         JSON.stringify(data),
         {
@@ -13,7 +19,34 @@ function jsonResponse(data, status = 200) {
     );
 }
 
+
+/* =====================================================
+   CMS AUTHORIZATION
+===================================================== */
+
+function isAuthorized(request) {
+
+    const expectedToken =
+        process.env.CMS_ADMIN_TOKEN;
+
+    if (!expectedToken) {
+        return false;
+    }
+
+    const authorization =
+        request.headers.get("authorization") || "";
+
+    return authorization ===
+        `Bearer ${expectedToken}`;
+}
+
+
+/* =====================================================
+   SLUGIFY
+===================================================== */
+
 function slugify(text) {
+
     return text
         .toString()
         .trim()
@@ -25,32 +58,54 @@ function slugify(text) {
         .slice(0, 80);
 }
 
+
+/* =====================================================
+   IMAGE EXTENSION
+===================================================== */
+
 function getExtension(mimeType) {
 
     const extensions = {
+
         "image/jpeg": "jpg",
         "image/jpg": "jpg",
         "image/png": "png",
         "image/gif": "gif",
         "image/webp": "webp",
         "image/svg+xml": "svg"
+
     };
 
     return extensions[mimeType] || "png";
 }
 
+
+/* =====================================================
+   GITHUB HEADERS
+===================================================== */
+
 function githubHeaders(token) {
+
     return {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2026-03-10",
-        "Content-Type": "application/json"
+
+        "Authorization":
+            `Bearer ${token}`,
+
+        "Accept":
+            "application/vnd.github+json",
+
+        "X-GitHub-Api-Version":
+            "2026-03-10",
+
+        "Content-Type":
+            "application/json"
+
     };
 }
 
 
 /* =====================================================
-   GET EXISTING FILE
+   GET EXISTING FILE SHA
 ===================================================== */
 
 async function getFileSha(
@@ -60,27 +115,41 @@ async function getFileSha(
     token
 ) {
 
-    const response = await fetch(
-        `${GITHUB_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${BRANCH}`,
-        {
-            method: "GET",
-            headers: githubHeaders(token)
-        }
-    );
+    const response =
+        await fetch(
+            `${GITHUB_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${BRANCH}`,
+            {
+                method: "GET",
+                headers: githubHeaders(token)
+            }
+        );
+
 
     if (response.status === 404) {
+
         return null;
+
     }
 
+
     if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
+
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
 
         throw new Error(
             `Could not check GitHub file ${path}: ${data.message || response.status}`
         );
+
     }
 
-    const data = await response.json();
+
+    const data =
+        await response.json();
+
 
     return data.sha;
 }
@@ -109,36 +178,54 @@ async function writeGitHubFile(
 
 
     const body = {
+
         message,
-        content: contentBase64,
-        branch: BRANCH
+
+        content:
+            contentBase64,
+
+        branch:
+            BRANCH
+
     };
 
 
     if (existingSha) {
-        body.sha = existingSha;
+
+        body.sha =
+            existingSha;
+
     }
 
 
-    const response = await fetch(
-        `${GITHUB_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`,
-        {
-            method: "PUT",
-            headers: githubHeaders(token),
-            body: JSON.stringify(body)
-        }
-    );
+    const response =
+        await fetch(
+            `${GITHUB_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`,
+            {
+                method: "PUT",
+
+                headers:
+                    githubHeaders(token),
+
+                body:
+                    JSON.stringify(body)
+
+            }
+        );
 
 
     const data =
-        await response.json().catch(() => ({}));
+        await response
+            .json()
+            .catch(() => ({}));
 
 
     if (!response.ok) {
 
         throw new Error(
             `GitHub could not write ${path}: ${
-                data.message || response.status
+                data.message ||
+                response.status
             }`
         );
 
@@ -150,7 +237,7 @@ async function writeGitHubFile(
 
 
 /* =====================================================
-   EXTRACT DATA URL IMAGES
+   PROCESS DATA URL IMAGES
 ===================================================== */
 
 async function processImages(
@@ -164,9 +251,12 @@ async function processImages(
     const imageRegex =
         /<img([^>]+)src=["'](data:image\/([^;]+);base64,([^"']+))["']([^>]*)>/gi;
 
+
     let imageNumber = 0;
 
-    let processedHTML = html;
+    let processedHTML =
+        html;
+
 
     const matches = [
         ...html.matchAll(imageRegex)
@@ -178,11 +268,17 @@ async function processImages(
         imageNumber++;
 
 
-        const fullTag = match[0];
+        const fullTag =
+            match[0];
 
-        const mimeSubtype = match[3];
 
-        const base64Data = match[4];
+        const mimeSubtype =
+            match[3];
+
+
+        const base64Data =
+            match[4];
+
 
         const mimeType =
             `image/${mimeSubtype}`;
@@ -211,9 +307,9 @@ async function processImages(
 
 
         /*
-            Article files live inside /posts/.
+            Article files are inside /posts/.
 
-            Therefore the correct relative path is:
+            Therefore images need:
 
             ../assets/blog/...
         */
@@ -248,7 +344,8 @@ async function processImages(
 
 function cleanArticleHTML(html) {
 
-    let cleaned = html;
+    let cleaned =
+        html;
 
 
     /*
@@ -274,7 +371,9 @@ function cleanArticleHTML(html) {
 
 
     /*
-        Remove inline event handlers such as:
+        Remove inline event handlers.
+
+        Examples:
 
         onclick=
         onerror=
@@ -283,7 +382,7 @@ function cleanArticleHTML(html) {
 
     cleaned =
         cleaned.replace(
-            /\s+on[a-z]+\s*=\s*(['"]).*?\1/gi,
+            /\s+on[a-z]+\s*=\s*(["']).*?\1/gi,
             ""
         );
 
@@ -305,33 +404,39 @@ function createArticleHTML({
 }) {
 
     const safeTitle =
-        title.replace(
-            /</g,
-            "&lt;"
-        ).replace(
-            />/g,
-            "&gt;"
-        );
+        title
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            );
 
 
     const safeCategory =
-        category.replace(
-            /</g,
-            "&lt;"
-        ).replace(
-            />/g,
-            "&gt;"
-        );
+        category
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            );
 
 
     const safeTags =
-        tags.replace(
-            /</g,
-            "&lt;"
-        ).replace(
-            />/g,
-            "&gt;"
-        );
+        tags
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            );
 
 
     return `<!DOCTYPE html>
@@ -491,7 +596,7 @@ function createArticleHTML({
    MAIN FUNCTION
 ===================================================== */
 
-export default async (request) => {
+export default async (request) {
 
     /*
         Only POST is allowed for publishing.
@@ -502,9 +607,29 @@ export default async (request) => {
         return jsonResponse(
             {
                 success: false,
-                message: "Use POST to publish a note."
+                message:
+                    "Use POST to publish a note."
             },
             405
+        );
+
+    }
+
+
+    /*
+        Protect publishing with
+        the private CMS token.
+    */
+
+    if (!isAuthorized(request)) {
+
+        return jsonResponse(
+            {
+                success: false,
+                message:
+                    "Unauthorized."
+            },
+            401
         );
 
     }
@@ -513,8 +638,10 @@ export default async (request) => {
     const token =
         process.env.GITHUB_TOKEN;
 
+
     const owner =
         process.env.GITHUB_OWNER;
+
 
     const repo =
         process.env.GITHUB_REPO;
@@ -541,16 +668,28 @@ export default async (request) => {
 
 
         const title =
-            String(body.title || "").trim();
+            String(
+                body.title || ""
+            ).trim();
+
 
         const category =
-            String(body.category || "Cybersecurity").trim();
+            String(
+                body.category ||
+                "Cybersecurity"
+            ).trim();
+
 
         const tags =
-            String(body.tags || "").trim();
+            String(
+                body.tags || ""
+            ).trim();
+
 
         let content =
-            String(body.content || "").trim();
+            String(
+                body.content || ""
+            ).trim();
 
 
         if (!title) {
@@ -600,8 +739,7 @@ export default async (request) => {
 
 
         /*
-            Limit slug length and avoid accidental
-            path manipulation.
+            Limit slug characters.
         */
 
         slug =
@@ -612,20 +750,24 @@ export default async (request) => {
 
 
         /*
-            Clean article HTML before publishing.
+            Clean article HTML.
         */
 
         content =
-            cleanArticleHTML(content);
+            cleanArticleHTML(
+                content
+            );
 
 
         const date =
-            new Date().toISOString().split("T")[0];
+            new Date()
+                .toISOString()
+                .split("T")[0];
 
 
         /*
-            Convert locally embedded images into
-            real GitHub files.
+            Convert locally embedded
+            images into GitHub files.
         */
 
         content =
@@ -639,7 +781,7 @@ export default async (request) => {
 
 
         /*
-            Build the final article.
+            Build final article.
         */
 
         const articleHTML =
@@ -678,10 +820,7 @@ export default async (request) => {
 
 
         /*
-            Prepare a lightweight public index.
-
-            If posts/index.json already exists,
-            keep its existing entries.
+            Prepare blog index.
         */
 
         const indexPath =
@@ -696,7 +835,8 @@ export default async (request) => {
                 `${GITHUB_API}/repos/${owner}/${repo}/contents/${encodeURIComponent(indexPath)}?ref=${BRANCH}`,
                 {
                     method: "GET",
-                    headers: githubHeaders(token)
+                    headers:
+                        githubHeaders(token)
                 }
             );
 
@@ -713,21 +853,33 @@ export default async (request) => {
 
                     const decoded =
                         Buffer.from(
-                            indexData.content.replace(/\n/g, ""),
+                            indexData.content
+                                .replace(/\n/g, ""),
                             "base64"
                         ).toString("utf8");
 
 
                     const existing =
-                        JSON.parse(decoded);
+                        JSON.parse(
+                            decoded
+                        );
 
 
-                    if (Array.isArray(existing)) {
-                        posts = existing;
+                    if (
+                        Array.isArray(
+                            existing
+                        )
+                    ) {
+
+                        posts =
+                            existing;
+
                     }
 
                 } catch {
+
                     posts = [];
+
                 }
 
             }
@@ -736,7 +888,8 @@ export default async (request) => {
 
 
         /*
-            Remove an existing entry for the same slug.
+            Remove existing entry
+            for the same slug.
         */
 
         posts =
@@ -747,13 +900,19 @@ export default async (request) => {
 
 
         /*
-            Create a short excerpt.
+            Create excerpt.
         */
 
         const plainText =
             content
-                .replace(/<[^>]*>/g, " ")
-                .replace(/\s+/g, " ")
+                .replace(
+                    /<[^>]*>/g,
+                    " "
+                )
+                .replace(
+                    /\s+/g,
+                    " "
+                )
                 .trim();
 
 
@@ -821,7 +980,8 @@ export default async (request) => {
 
         return jsonResponse({
 
-            success: true,
+            success:
+                true,
 
             message:
                 "Note published successfully.",
