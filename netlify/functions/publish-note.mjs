@@ -13,7 +13,8 @@ function jsonResponse(data, status = 200) {
         {
             status,
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store"
             }
         }
     );
@@ -24,6 +25,40 @@ function jsonResponse(data, status = 200) {
    CMS AUTHORIZATION
 ===================================================== */
 
+function getCookie(request, name) {
+
+    const cookieHeader =
+        request.headers.get("cookie") || "";
+
+    const cookies =
+        cookieHeader
+            .split(";")
+            .map(cookie => cookie.trim());
+
+    const prefix = `${name}=`;
+
+    const found =
+        cookies.find(cookie =>
+            cookie.startsWith(prefix)
+        );
+
+    if (!found) {
+        return "";
+    }
+
+    try {
+
+        return decodeURIComponent(
+            found.slice(prefix.length)
+        );
+
+    } catch {
+
+        return "";
+    }
+}
+
+
 function isAuthorized(request) {
 
     const expectedToken =
@@ -33,11 +68,48 @@ function isAuthorized(request) {
         return false;
     }
 
+
+    /*
+        Method 1:
+        Authorization header
+
+        Kept for compatibility with
+        direct/API requests.
+    */
+
     const authorization =
         request.headers.get("authorization") || "";
 
-    return authorization ===
-        `Bearer ${expectedToken}`;
+    if (
+        authorization ===
+        `Bearer ${expectedToken}`
+    ) {
+
+        return true;
+    }
+
+
+    /*
+        Method 2:
+        Secure HttpOnly CMS session cookie
+    */
+
+    const sessionToken =
+        getCookie(
+            request,
+            "cms_session"
+        );
+
+    if (
+        sessionToken ===
+        expectedToken
+    ) {
+
+        return true;
+    }
+
+
+    return false;
 }
 
 
