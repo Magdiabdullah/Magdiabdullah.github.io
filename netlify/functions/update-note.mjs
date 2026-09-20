@@ -1,13 +1,15 @@
 const GITHUB_API = "https://api.github.com";
 const BRANCH = "main";
 
+
 function jsonResponse(data, status = 200) {
     return new Response(
         JSON.stringify(data),
         {
             status,
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Cache-Control": "no-store"
             }
         }
     );
@@ -18,6 +20,40 @@ function jsonResponse(data, status = 200) {
    CMS AUTHORIZATION
 ===================================================== */
 
+function getCookie(request, name) {
+
+    const cookieHeader =
+        request.headers.get("cookie") || "";
+
+    const cookies =
+        cookieHeader
+            .split(";")
+            .map(cookie => cookie.trim());
+
+    const prefix = `${name}=`;
+
+    const found =
+        cookies.find(cookie =>
+            cookie.startsWith(prefix)
+        );
+
+    if (!found) {
+        return "";
+    }
+
+    try {
+
+        return decodeURIComponent(
+            found.slice(prefix.length)
+        );
+
+    } catch {
+
+        return "";
+    }
+}
+
+
 function isAuthorized(request) {
 
     const expectedToken =
@@ -27,11 +63,48 @@ function isAuthorized(request) {
         return false;
     }
 
+
+    /*
+        Method 1:
+        Authorization header
+
+        Kept for compatibility with
+        direct/API requests.
+    */
+
     const authorization =
         request.headers.get("authorization") || "";
 
-    return authorization ===
-        `Bearer ${expectedToken}`;
+    if (
+        authorization ===
+        `Bearer ${expectedToken}`
+    ) {
+
+        return true;
+    }
+
+
+    /*
+        Method 2:
+        Secure HttpOnly CMS session cookie
+    */
+
+    const sessionToken =
+        getCookie(
+            request,
+            "cms_session"
+        );
+
+    if (
+        sessionToken ===
+        expectedToken
+    ) {
+
+        return true;
+    }
+
+
+    return false;
 }
 
 
@@ -520,6 +593,7 @@ function extractArticleData(html) {
             meta.split(" • ");
 
         if (parts.length > 1) {
+
             tags =
                 parts
                     .slice(1)
@@ -825,7 +899,7 @@ async function savePostsIndex(
    MAIN FUNCTION
 ===================================================== */
 
-export default async (request) => {
+export default async (request) {
 
     /*
         Protect note loading and updating
@@ -844,6 +918,7 @@ export default async (request) => {
         );
 
     }
+
 
     const token =
         process.env.GITHUB_TOKEN;
@@ -1094,6 +1169,7 @@ export default async (request) => {
                         possibleDate
                     )
                 ) {
+
                     publicationDate =
                         possibleDate;
                 }
@@ -1289,6 +1365,7 @@ export default async (request) => {
             const imageReferenceRegex =
                 /(?:\.\.\/)?assets\/blog\/[^/"']+\/(image-\d+\.(?:jpg|jpeg|png|gif|webp|svg))/gi;
 
+
             for (
                 const match of content.matchAll(
                     imageReferenceRegex
@@ -1373,6 +1450,7 @@ export default async (request) => {
             "Update note error:",
             error
         );
+
 
         return jsonResponse(
             {
