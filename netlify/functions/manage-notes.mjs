@@ -30,6 +30,32 @@ function jsonResponse(statusCode, body) {
 
 
 /* =====================================================
+   CMS AUTHORIZATION
+===================================================== */
+
+function isAuthorized(event) {
+
+    const expectedToken =
+        process.env.CMS_ADMIN_TOKEN;
+
+    if (!expectedToken) {
+        return false;
+    }
+
+    const headers =
+        event.headers || {};
+
+    const authorization =
+        headers.authorization ||
+        headers.Authorization ||
+        "";
+
+    return authorization ===
+        `Bearer ${expectedToken}`;
+}
+
+
+/* =====================================================
    GITHUB HEADERS
 ===================================================== */
 
@@ -412,8 +438,8 @@ async function removePublishedNote(
 
 
     /*
-       Remove the note from the public
-       index first.
+        Remove the note from the public
+        index first.
     */
 
     const updatedPosts =
@@ -557,6 +583,28 @@ export async function handler(
 ) {
 
     try {
+
+        /* =============================================
+           CMS AUTHORIZATION
+        ============================================= */
+
+        if (!isAuthorized(event)) {
+
+            return jsonResponse(
+
+                401,
+
+                {
+
+                    success:
+                        false,
+
+                    message:
+                        "Unauthorized."
+                }
+            );
+        }
+
 
         validateConfig();
 
