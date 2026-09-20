@@ -415,6 +415,12 @@
             font-size: 13px;
 
             font-style: italic;
+
+            text-align: center;
+
+            display: block;
+
+            width: 100%;
         }
 
 
@@ -659,6 +665,12 @@
             font-size: 13px;
 
             margin-top: 8px;
+
+            text-align: center;
+
+            display: block;
+
+            width: 100%;
         }
 
 
@@ -1968,6 +1980,34 @@ function addText() {
     );
 
 
+    /*
+       Put the cursor INSIDE the new text block.
+       This means a text block only appears when
+       the user clicks + TEXT.
+    */
+
+    const range =
+        document.createRange();
+
+    range.selectNodeContents(
+        textBlock
+    );
+
+    range.collapse(false);
+
+    const selection =
+        window.getSelection();
+
+    selection.removeAllRanges();
+    selection.addRange(
+        range
+    );
+
+    savedRange =
+        range.cloneRange();
+
+    articleContent.focus();
+
     autoSaveDraft();
 }
 
@@ -2125,59 +2165,12 @@ function insertImage() {
 
 
             /*
-               Add a clean paragraph after the
-               image so the user can continue
-               writing normally.
+               Keep the image and caption together as ONE block.
+
+               Do not create an automatic empty paragraph here.
+               The next block is created only when the user
+               explicitly clicks + TEXT, + IMAGE, or + CODE.
             */
-
-            const spacer =
-                document.createElement(
-                    "p"
-                );
-
-            spacer.innerHTML =
-                "<br>";
-
-
-            if (
-                figure.nextSibling
-            ) {
-
-                figure.parentNode.insertBefore(
-                    spacer,
-                    figure.nextSibling
-                );
-
-            } else {
-
-                articleContent.appendChild(
-                    spacer
-                );
-            }
-
-
-            const range =
-                document.createRange();
-
-            range.selectNodeContents(
-                spacer
-            );
-
-            range.collapse(false);
-
-
-            const selection =
-                window.getSelection();
-
-            selection.removeAllRanges();
-            selection.addRange(
-                range
-            );
-
-
-            savedRange =
-                range.cloneRange();
-
 
             closeImageDialog();
 
@@ -2229,59 +2222,11 @@ function addCode() {
 
 
     /*
-       Add a paragraph after the code block
-       so the next text/code/image is never
-       accidentally inserted inside <pre>.
+       Do not create an automatic empty text paragraph.
+
+       The next block is created only when the user explicitly
+       clicks + TEXT, + IMAGE, or + CODE.
     */
-
-    const spacer =
-        document.createElement(
-            "p"
-        );
-
-    spacer.innerHTML =
-        "<br>";
-
-
-    if (
-        pre.nextSibling
-    ) {
-
-        pre.parentNode.insertBefore(
-            spacer,
-            pre.nextSibling
-        );
-
-    } else {
-
-        articleContent.appendChild(
-            spacer
-        );
-    }
-
-
-    const range =
-        document.createRange();
-
-    range.selectNodeContents(
-        spacer
-    );
-
-    range.collapse(false);
-
-
-    const selection =
-        window.getSelection();
-
-    selection.removeAllRanges();
-    selection.addRange(
-        range
-    );
-
-
-    savedRange =
-        range.cloneRange();
-
 
     articleContent.focus();
 
