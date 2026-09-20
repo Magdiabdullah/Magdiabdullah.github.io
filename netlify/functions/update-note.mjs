@@ -15,6 +15,27 @@ function jsonResponse(data, status = 200) {
 
 
 /* =====================================================
+   CMS AUTHORIZATION
+===================================================== */
+
+function isAuthorized(request) {
+
+    const expectedToken =
+        process.env.CMS_ADMIN_TOKEN;
+
+    if (!expectedToken) {
+        return false;
+    }
+
+    const authorization =
+        request.headers.get("authorization") || "";
+
+    return authorization ===
+        `Bearer ${expectedToken}`;
+}
+
+
+/* =====================================================
    SLUG VALIDATION
 ===================================================== */
 
@@ -806,6 +827,24 @@ async function savePostsIndex(
 
 export default async (request) => {
 
+    /*
+        Protect note loading and updating
+        with the private CMS token.
+    */
+
+    if (!isAuthorized(request)) {
+
+        return jsonResponse(
+            {
+                success: false,
+                message:
+                    "Unauthorized."
+            },
+            401
+        );
+
+    }
+
     const token =
         process.env.GITHUB_TOKEN;
 
@@ -1245,6 +1284,7 @@ export default async (request) => {
 
             const referencedImages =
                 new Set();
+
 
             const imageReferenceRegex =
                 /(?:\.\.\/)?assets\/blog\/[^/"']+\/(image-\d+\.(?:jpg|jpeg|png|gif|webp|svg))/gi;
