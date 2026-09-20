@@ -1,14 +1,5 @@
 [
   {
-    "slug": "trt",
-    "title": "trt",
-    "category": "Networking",
-    "tags": "ty",
-    "date": "2026-09-20",
-    "excerpt": "Write your text here...ttrrrrrrrrrrrry",
-    "url": "posts/trt.html"
-  },
-  {
     "slug": "cms-edit-test",
     "title": "CMS Edit Test",
     "category": "Other",
