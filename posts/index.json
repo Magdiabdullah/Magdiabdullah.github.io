@@ -1,5 +1,14 @@
 [
   {
+    "slug": "linux-fundamentals-for-cybersecurity-files-permissions-processes",
+    "title": "Linux Fundamentals for Cybersecurity: Files, Permissions & Processes",
+    "category": "Linux",
+    "tags": "Linux, cybersecurity, command line, permissions, processes",
+    "date": "2026-09-20",
+    "excerpt": "Why Linux Matters in Cybersecurity Linux is commonly used for servers, security appliances, cloud infrastructure, and penetration-testing environments. Many cybersecurity tools als...",
+    "url": "posts/linux-fundamentals-for-cybersecurity-files-permissions-processes.html"
+  },
+  {
     "slug": "web-application-security-understanding-how-web-attacks-work",
     "title": "Web Application Security: Understanding How Web Attacks Work",
     "category": "Web Security",
