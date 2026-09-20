@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Web Application Security: Understanding How Web Attacks Work | Magdi Saad</title>
+
+    <link
+        rel="stylesheet"
+        href="../style.css">
+
+    <style>
+
+        body {
+            background: #050806;
+            color: #d9e8de;
+        }
+
+        .post-wrapper {
+            width: min(900px, 92%);
+            margin: 60px auto 100px;
+        }
+
+        .post-category {
+            color: #00ff88;
+            font-family: monospace;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .post-title {
+            color: #ffffff;
+            font-size: clamp(32px, 6vw, 56px);
+            line-height: 1.1;
+            margin: 15px 0;
+        }
+
+        .post-meta {
+            color: #6f8c7b;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 45px;
+        }
+
+        .post-content {
+            font-size: 17px;
+            line-height: 1.85;
+        }
+
+        .post-content p {
+            margin-bottom: 22px;
+        }
+
+        .post-content figure {
+            margin: 35px auto;
+            text-align: center;
+        }
+
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 1px solid rgba(0,255,140,.15);
+        }
+
+        .post-content figcaption {
+            margin-top: 10px;
+            color: #6f8c7b;
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        .post-content pre {
+            background: #020503;
+            border: 1px solid rgba(0,255,140,.18);
+            border-left: 3px solid #00ff88;
+            border-radius: 6px;
+            padding: 20px;
+            overflow-x: auto;
+            color: #9dffca;
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .post-content code {
+            font-family: "Courier New", monospace;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #00ff88;
+            text-decoration: none;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="post-wrapper">
+
+        <a
+            class="back-link"
+            href="../blog.html">
+            ← BACK TO SECURITY NOTES
+        </a>
+
+        <div class="post-category">
+            Web Security
+        </div>
+
+        <h1 class="post-title">
+            Web Application Security: Understanding How Web Attacks Work
+        </h1>
+
+        <div class="post-meta">
+            2026-09-20
+             • web security, HTTP, OWASP, XSS, SQL injection, authentication
+        </div>
+
+        <article class="post-content">
+
+            <p dir="auto" data-start="387" data-end="424" class="PDq2pG_selectionAnchorContainer"><strong data-start="387" data-end="424">What Is Web Application Security?</strong><span aria-hidden="true" class="PDq2pG_selectionAnchor"></span></p>
+<p dir="auto" data-start="426" data-end="547">Web application security is the practice of protecting websites, APIs, and web services from attacks and vulnerabilities.</p>
+<p dir="auto" data-start="549" data-end="702">Modern applications process sensitive information such as credentials, personal data, and financial transactions, making them important security targets.</p>
+<p dir="auto" data-start="704" data-end="733"><strong data-start="704" data-end="733">How Web Applications Work</strong></p>
+<p dir="auto" data-start="735" data-end="766">A typical web request involves:</p>
+<p dir="auto" data-start="768" data-end="817"><strong data-start="768" data-end="817">Browser → Web Server → Application → Database</strong></p>
+<p dir="auto" data-start="819" data-end="878">Security weaknesses can occur at any point in this process.</p>
+<p dir="auto" data-start="880" data-end="910"><strong data-start="880" data-end="910">Common Web Vulnerabilities</strong></p>
+<p dir="auto" data-start="912" data-end="951">Some important vulnerabilities include:</p>
+<ul data-start="953" data-end="1430">
+<li data-start="953" data-end="1026">
+<strong data-start="955" data-end="972">SQL Injection</strong> — manipulating database queries through unsafe input.
+</li>
+<li data-start="1027" data-end="1105">
+<strong data-start="1029" data-end="1059">Cross-Site Scripting (XSS)</strong> — injecting malicious scripts into web pages.
+</li>
+<li data-start="1106" data-end="1198">
+<strong data-start="1108" data-end="1133">Broken Access Control</strong> — accessing resources or functions without proper authorization.
+</li>
+<li data-start="1199" data-end="1272">
+<strong data-start="1201" data-end="1226">Authentication Issues</strong> — weaknesses in login and session management.
+</li>
+<li data-start="1273" data-end="1352">
+<strong data-start="1275" data-end="1283">CSRF</strong> — tricking an authenticated user into performing an unwanted action.
+</li>
+<li data-start="1353" data-end="1430">
+<strong data-start="1355" data-end="1363">SSRF</strong> — causing a server to make unintended requests to other resources.
+</li>
+</ul>
+<p dir="auto" data-start="1432" data-end="1452"><strong data-start="1432" data-end="1452">Security Testing</strong></p>
+<p dir="auto" data-start="1454" data-end="1516">Common tools used for authorized web security testing include:</p>
+<ul data-start="1518" data-end="1575">
+<li data-start="1518" data-end="1530">
+Burp Suite
+</li>
+<li data-start="1531" data-end="1542">
+OWASP ZAP
+</li>
+<li data-start="1543" data-end="1549">
+Nmap
+</li>
+<li data-start="1550" data-end="1575">
+Browser Developer Tools
+</li>
+</ul>
+<p dir="auto" data-start="1577" data-end="1679">Testing should always be performed against applications you own or have explicit permission to assess.</p>
+<p dir="auto" data-start="1681" data-end="1716"><strong data-start="1681" data-end="1716">How to Protect Web Applications</strong></p>
+<p dir="auto" data-start="1718" data-end="1754">Developers can reduce risk by using:</p>
+<ul data-start="1756" data-end="1951">
+<li data-start="1756" data-end="1797">
+Strong authentication and authorization
+</li>
+<li data-start="1798" data-end="1816">
+Input validation
+</li>
+<li data-start="1817" data-end="1840">
+Parameterized queries
+</li>
+<li data-start="1841" data-end="1868">
+Secure session management
+</li>
+<li data-start="1869" data-end="1876">
+HTTPS
+</li>
+<li data-start="1877" data-end="1895">
+Security headers
+</li>
+<li data-start="1896" data-end="1927">
+Regular vulnerability testing
+</li>
+<li data-start="1928" data-end="1951">
+Proper error handling
+</li>
+</ul>
+<p dir="auto" data-start="1953" data-end="1969"><strong data-start="1953" data-end="1969">Key Takeaway</strong></p>
+<p dir="auto" data-start="1971" data-end="2176" data-is-last-node="" data-is-only-node="">Web security is not only about finding vulnerabilities. It is about understanding how applications process <strong data-start="2078" data-end="2129">requests, data, authentication, and permissions</strong>, and ensuring each part is properly protected.</p>
+
+        </article>
+
+    </main>
+
+</body>
+
+</html>
