@@ -1496,30 +1496,479 @@ setInterval(
 
 
 /* =====================================================
+   EDITOR INSERTION / CURSOR MANAGEMENT
+===================================================== */
+
+/*
+   The editor uses contenteditable.
+
+   Important:
+   document.execCommand("insertHTML") can insert a block such as
+   <pre> or <figure> INSIDE the current <p>. That is what caused
+   descriptions and code blocks to become merged.
+
+   We therefore save the cursor and insert block elements at the
+   article's top level, splitting the current text block when needed.
+*/
+
+let savedRange = null;
+
+
+function saveSelection() {
+
+    const selection =
+        window.getSelection();
+
+    if (!selection || !selection.rangeCount) {
+        return;
+    }
+
+    const range =
+        selection.getRangeAt(0);
+
+    if (
+        articleContent.contains(range.commonAncestorContainer)
+    ) {
+        savedRange =
+            range.cloneRange();
+    }
+}
+
+
+
+function restoreSelection() {
+
+    if (!savedRange) {
+        articleContent.focus();
+
+        const range =
+            document.createRange();
+
+        range.selectNodeContents(articleContent);
+        range.collapse(false);
+
+        const selection =
+            window.getSelection();
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        return range;
+    }
+
+
+    articleContent.focus();
+
+    const selection =
+        window.getSelection();
+
+    selection.removeAllRanges();
+
+    selection.addRange(
+        savedRange
+    );
+
+    return savedRange;
+}
+
+
+
+function getTopLevelBlock(node) {
+
+    if (!node) {
+        return null;
+    }
+
+
+    let current =
+        node.nodeType === Node.ELEMENT_NODE
+            ? node
+            : node.parentElement;
+
+
+    while (
+        current &&
+        current.parentElement !== articleContent
+    ) {
+        current =
+            current.parentElement;
+    }
+
+
+    if (
+        current &&
+        current.parentElement === articleContent
+    ) {
+        return current;
+    }
+
+
+    return null;
+}
+
+
+
+function isMeaningfulNode(node) {
+
+    if (!node) {
+        return false;
+    }
+
+
+    if (
+        node.nodeType === Node.TEXT_NODE
+    ) {
+        return node.textContent.trim().length > 0;
+    }
+
+
+    if (
+        node.nodeType === Node.ELEMENT_NODE
+    ) {
+        if (
+            node.matches(
+                "br, img, figure, pre, table, ul, ol, blockquote, hr"
+            )
+        ) {
+            return true;
+        }
+
+        return (
+            node.textContent.trim().length > 0
+        );
+    }
+
+
+    return false;
+}
+
+
+
+function insertTopLevelBlock(newNode) {
+
+    let range =
+        restoreSelection();
+
+
+    /*
+       If the selection is inside a top-level text block,
+       split that block at the cursor.
+
+       Example:
+
+       <p>Photo description|continued text</p>
+
+       becomes:
+
+       <p>Photo description</p>
+       <pre>CODE</pre>
+       <p>continued text</p>
+    */
+
+    let block =
+        getTopLevelBlock(
+            range.startContainer
+        );
+
+
+    /*
+       If the cursor is directly inside articleContent,
+       insert directly at that position.
+    */
+
+    if (!block) {
+
+        range.deleteContents();
+
+        range.insertNode(
+            newNode
+        );
+
+        savedRange =
+            document.createRange();
+
+        savedRange.setStartAfter(
+            newNode
+        );
+
+        savedRange.collapse(true);
+
+        return;
+    }
+
+
+    /*
+       If the current top-level element is a figure,
+       pre, image block, etc., place the new block after it.
+       Normal text blocks are split instead.
+    */
+
+    const blockTag =
+        block.tagName.toLowerCase();
+
+
+    const nonSplittable =
+        [
+            "figure",
+            "pre",
+            "ul",
+            "ol",
+            "blockquote",
+            "table"
+        ].includes(blockTag);
+
+
+    if (nonSplittable) {
+
+        const after =
+            document.createRange();
+
+        after.setStartAfter(block);
+        after.collapse(true);
+
+        after.insertNode(
+            newNode
+        );
+
+    } else {
+
+        /*
+           Delete selected text first.
+        */
+
+        if (!range.collapsed) {
+            range.deleteContents();
+        }
+
+
+        /*
+           Extract everything from the cursor
+           to the end of the current block.
+        */
+
+        const afterRange =
+            document.createRange();
+
+        afterRange.selectNodeContents(
+            block
+        );
+
+        afterRange.setStart(
+            range.startContainer,
+            range.startOffset
+        );
+
+
+        const afterContent =
+            afterRange.extractContents();
+
+
+        /*
+           Create a second copy of the current
+           block containing the text after the cursor.
+        */
+
+        let afterBlock = null;
+
+
+        if (
+            afterContent &&
+            afterContent.childNodes.length > 0 &&
+            Array.from(
+                afterContent.childNodes
+            ).some(isMeaningfulNode)
+        ) {
+
+            afterBlock =
+                block.cloneNode(false);
+
+            afterBlock.appendChild(
+                afterContent
+            );
+        }
+
+
+        /*
+           The original block now contains only
+           the content before the cursor.
+        */
+
+        const parent =
+            block.parentNode;
+
+
+        /*
+           If the original block became empty,
+           remove it. Otherwise keep it.
+        */
+
+        const beforeIsMeaningful =
+            isMeaningfulNode(block);
+
+
+        if (!beforeIsMeaningful) {
+            parent.removeChild(block);
+        }
+
+
+        /*
+           Insert the new block at the correct position.
+        */
+
+        if (block.parentNode === parent) {
+
+            parent.insertBefore(
+                newNode,
+                block.nextSibling
+            );
+
+        } else if (afterBlock) {
+
+            parent.insertBefore(
+                newNode,
+                afterBlock
+            );
+
+        } else {
+
+            parent.appendChild(
+                newNode
+            );
+        }
+
+
+        /*
+           Put the remaining text after the new block.
+        */
+
+        if (afterBlock) {
+
+            if (
+                newNode.nextSibling
+            ) {
+                parent.insertBefore(
+                    afterBlock,
+                    newNode.nextSibling
+                );
+            } else {
+                parent.appendChild(
+                    afterBlock
+                );
+            }
+        }
+    }
+
+
+    /*
+       Place the cursor after the inserted block.
+    */
+
+    const newRange =
+        document.createRange();
+
+    newRange.setStartAfter(
+        newNode
+    );
+
+    newRange.collapse(true);
+
+    const selection =
+        window.getSelection();
+
+    selection.removeAllRanges();
+    selection.addRange(
+        newRange
+    );
+
+    savedRange =
+        newRange.cloneRange();
+
+
+    articleContent.focus();
+}
+
+
+
+function setupEditorSelectionTracking() {
+
+    document.addEventListener(
+        "selectionchange",
+        function() {
+
+            const selection =
+                window.getSelection();
+
+            if (
+                !selection ||
+                !selection.rangeCount
+            ) {
+                return;
+            }
+
+
+            const range =
+                selection.getRangeAt(0);
+
+
+            if (
+                articleContent.contains(
+                    range.commonAncestorContainer
+                )
+            ) {
+                savedRange =
+                    range.cloneRange();
+            }
+        }
+    );
+
+
+    /*
+       Save the selection before toolbar buttons
+       take focus away from the editor.
+    */
+
+    document
+        .querySelectorAll(
+            ".toolbar-btn"
+        )
+        .forEach(
+            function(button) {
+
+                button.addEventListener(
+                    "mousedown",
+                    function() {
+                        saveSelection();
+                    }
+                );
+
+            }
+        );
+}
+
+
+setupEditorSelectionTracking();
+
+
+
+/* =====================================================
    ADD TEXT
 ===================================================== */
 
 function addText() {
 
-    articleContent.focus();
+    const textBlock =
+        document.createElement("p");
+
+    textBlock.textContent =
+        "Write your text here...";
 
 
-    const html = `
-        <p>
-            Write your text here...
-        </p>
-    `;
-
-
-    document.execCommand(
-        "insertHTML",
-        false,
-        html
+    insertTopLevelBlock(
+        textBlock
     );
 
 
     autoSaveDraft();
-
 }
 
 
@@ -1530,7 +1979,7 @@ function addText() {
 
 function formatText(command) {
 
-    articleContent.focus();
+    restoreSelection();
 
 
     document.execCommand(
@@ -1540,8 +1989,9 @@ function formatText(command) {
     );
 
 
-    autoSaveDraft();
+    saveSelection();
 
+    autoSaveDraft();
 }
 
 
@@ -1551,6 +2001,14 @@ function formatText(command) {
 ===================================================== */
 
 function openImageDialog() {
+
+    /*
+       Save the exact cursor position BEFORE
+       the file dialog takes focus.
+    */
+
+    saveSelection();
+
 
     imageInput.value = "";
 
@@ -1592,7 +2050,6 @@ function insertImage() {
         );
 
         return;
-
     }
 
 
@@ -1603,7 +2060,6 @@ function insertImage() {
     reader.onload =
         function(event) {
 
-
             const imageURL =
                 event.target.result;
 
@@ -1612,53 +2068,120 @@ function insertImage() {
                 imageCaption.value.trim();
 
 
-            let captionHTML =
-                "";
+            const figure =
+                document.createElement(
+                    "figure"
+                );
+
+            figure.className =
+                "article-image";
+
+
+            const img =
+                document.createElement(
+                    "img"
+                );
+
+            img.src =
+                imageURL;
+
+            img.alt =
+                caption ||
+                "Blog image";
+
+
+            figure.appendChild(
+                img
+            );
 
 
             if (caption) {
 
-                captionHTML = `
-                    <figcaption>
-                        ${escapeHTML(caption)}
-                    </figcaption>
-                `;
+                const figcaption =
+                    document.createElement(
+                        "figcaption"
+                    );
 
+                figcaption.textContent =
+                    caption;
+
+                figure.appendChild(
+                    figcaption
+                );
             }
 
 
-            const imageHTML = `
+            /*
+               Restore the cursor that existed
+               before the image dialog opened.
+            */
 
-                <figure class="article-image">
-
-                    <img
-                        src="${imageURL}"
-                        alt="${escapeHTML(
-                            caption ||
-                            "Blog image"
-                        )}">
-
-                    ${captionHTML}
-
-                </figure>
-
-                <p><br></p>
-
-            `;
+            restoreSelection();
 
 
-            articleContent.focus();
-
-
-            document.execCommand(
-                "insertHTML",
-                false,
-                imageHTML
+            insertTopLevelBlock(
+                figure
             );
+
+
+            /*
+               Add a clean paragraph after the
+               image so the user can continue
+               writing normally.
+            */
+
+            const spacer =
+                document.createElement(
+                    "p"
+                );
+
+            spacer.innerHTML =
+                "<br>";
+
+
+            if (
+                figure.nextSibling
+            ) {
+
+                figure.parentNode.insertBefore(
+                    spacer,
+                    figure.nextSibling
+                );
+
+            } else {
+
+                articleContent.appendChild(
+                    spacer
+                );
+            }
+
+
+            const range =
+                document.createRange();
+
+            range.selectNodeContents(
+                spacer
+            );
+
+            range.collapse(false);
+
+
+            const selection =
+                window.getSelection();
+
+            selection.removeAllRanges();
+            selection.addRange(
+                range
+            );
+
+
+            savedRange =
+                range.cloneRange();
 
 
             closeImageDialog();
 
+            articleContent.focus();
 
             autoSaveDraft();
 
@@ -1677,29 +2200,94 @@ function insertImage() {
 
 function addCode() {
 
-    articleContent.focus();
+    const pre =
+        document.createElement(
+            "pre"
+        );
+
+    pre.className =
+        "code-block";
 
 
-    const codeHTML = `
+    const code =
+        document.createElement(
+            "code"
+        );
 
-        <pre class="code-block"><code>// Write your code here...</code></pre>
-
-        <p><br></p>
-
-    `;
+    code.textContent =
+        "// Write your code here...";
 
 
-    document.execCommand(
-        "insertHTML",
-        false,
-        codeHTML
+    pre.appendChild(
+        code
     );
 
+
+    insertTopLevelBlock(
+        pre
+    );
+
+
+    /*
+       Add a paragraph after the code block
+       so the next text/code/image is never
+       accidentally inserted inside <pre>.
+    */
+
+    const spacer =
+        document.createElement(
+            "p"
+        );
+
+    spacer.innerHTML =
+        "<br>";
+
+
+    if (
+        pre.nextSibling
+    ) {
+
+        pre.parentNode.insertBefore(
+            spacer,
+            pre.nextSibling
+        );
+
+    } else {
+
+        articleContent.appendChild(
+            spacer
+        );
+    }
+
+
+    const range =
+        document.createRange();
+
+    range.selectNodeContents(
+        spacer
+    );
+
+    range.collapse(false);
+
+
+    const selection =
+        window.getSelection();
+
+    selection.removeAllRanges();
+    selection.addRange(
+        range
+    );
+
+
+    savedRange =
+        range.cloneRange();
+
+
+    articleContent.focus();
 
     autoSaveDraft();
 
 }
-
 
 
 /* =====================================================
