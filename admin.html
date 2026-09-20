@@ -782,6 +782,129 @@
 
 
         /* =========================
+           DRAFT MANAGEMENT
+        ========================= */
+
+        .draft-manager {
+            margin-top: 30px;
+            background: rgba(5, 12, 8, 0.9);
+            border: 1px solid rgba(0, 255, 140, 0.15);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .draft-manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .draft-manager-title {
+            color: #00ff88;
+            font-family: monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .draft-manager-subtitle {
+            color: #5e7868;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .draft-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .draft-empty {
+            padding: 20px;
+            border: 1px dashed rgba(0, 255, 140, 0.18);
+            border-radius: 7px;
+            color: #5e7868;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .draft-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            background: #08100b;
+            border: 1px solid rgba(0, 255, 140, 0.10);
+            border-radius: 7px;
+        }
+
+        .draft-item.current {
+            border-color: rgba(0, 255, 140, 0.35);
+            box-shadow: 0 0 0 1px rgba(0, 255, 140, 0.04);
+        }
+
+        .draft-item-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .draft-item-title {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .draft-item-meta {
+            margin-top: 5px;
+            color: #5e7868;
+            font-family: monospace;
+            font-size: 10px;
+        }
+
+        .draft-item-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .draft-small-btn {
+            padding: 7px 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 140, 0.20);
+            background: transparent;
+            color: #00ff88;
+            font-family: monospace;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .draft-small-btn:hover {
+            background: rgba(0, 255, 140, 0.08);
+            border-color: #00ff88;
+        }
+
+        .draft-small-btn.delete {
+            color: #ff7373;
+            border-color: rgba(255, 80, 80, 0.25);
+        }
+
+        .draft-small-btn.delete:hover {
+            background: rgba(255, 80, 80, 0.08);
+            border-color: #ff7373;
+        }
+
+        .draft-manager.hidden {
+            display: none;
+        }
+
+        /* =========================
            RESPONSIVE
         ========================= */
 
@@ -863,9 +986,9 @@
 
             <button
                 class="admin-btn"
-                onclick="loadDraft()">
+                onclick="toggleDraftManager()">
 
-                LOAD DRAFT
+                MY DRAFTS
 
             </button>
 
@@ -982,6 +1105,42 @@
 
     </section>
 
+
+
+    <!-- =========================
+         DRAFT MANAGEMENT
+    ========================= -->
+
+    <section
+        id="draftManager"
+        class="draft-manager hidden">
+
+        <div class="draft-manager-header">
+
+            <div>
+                <div class="draft-manager-title">
+                    MY DRAFTS
+                </div>
+
+                <div class="draft-manager-subtitle">
+                    Local drafts are stored only in this browser.
+                </div>
+            </div>
+
+            <button
+                class="admin-btn"
+                onclick="toggleDraftManager()">
+                CLOSE
+            </button>
+
+        </div>
+
+        <div
+            id="draftList"
+            class="draft-list">
+        </div>
+
+    </section>
 
 
     <!-- =========================
@@ -1322,18 +1481,105 @@ const draftInfo =
    DRAFT STORAGE
 ===================================================== */
 
-const DRAFT_KEY =
+/*
+   Drafts are stored as a collection.
+
+   This prevents a new note from overwriting an older
+   note when auto-save runs.
+*/
+
+const DRAFTS_KEY =
+    "magdi_blog_drafts_v1";
+
+const LEGACY_DRAFT_KEY =
     "magdi_blog_current_draft";
 
+let currentDraftId =
+    null;
 
 
 /* =====================================================
-   GET DRAFT DATA
+   DRAFT HELPERS
 ===================================================== */
+
+function createDraftId() {
+
+    return (
+        "draft_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random()
+            .toString(36)
+            .slice(2, 8)
+    );
+
+}
+
+
+function getDrafts() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                DRAFTS_KEY
+            );
+
+        if (!saved) {
+
+            return [];
+
+        }
+
+        const drafts =
+            JSON.parse(saved);
+
+        return Array.isArray(drafts)
+            ? drafts
+            : [];
+
+    } catch (error) {
+
+        console.error(
+            "Could not read drafts:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+function setDrafts(drafts) {
+
+    localStorage.setItem(
+        DRAFTS_KEY,
+        JSON.stringify(drafts)
+    );
+
+}
+
+
+function hasEditorContent() {
+
+    return Boolean(
+        titleInput.value.trim() ||
+        categoryInput.value.trim() ||
+        tagsInput.value.trim() ||
+        articleContent.innerText.trim()
+    );
+
+}
+
 
 function getDraftData() {
 
     return {
+
+        id:
+            currentDraftId,
 
         title:
             titleInput.value,
@@ -1355,6 +1601,180 @@ function getDraftData() {
 }
 
 
+function ensureCurrentDraft() {
+
+    if (!currentDraftId) {
+
+        currentDraftId =
+            createDraftId();
+
+    }
+
+    return currentDraftId;
+
+}
+
+
+function saveCurrentDraft(
+    showStatus = true
+) {
+
+    if (!hasEditorContent()) {
+
+        return false;
+
+    }
+
+
+    ensureCurrentDraft();
+
+
+    const draft =
+        getDraftData();
+
+
+    const drafts =
+        getDrafts();
+
+
+    const existingIndex =
+        drafts.findIndex(
+            item =>
+                item.id ===
+                currentDraftId
+        );
+
+
+    if (existingIndex >= 0) {
+
+        drafts[existingIndex] =
+            draft;
+
+    } else {
+
+        drafts.push(
+            draft
+        );
+
+    }
+
+
+    setDrafts(
+        drafts
+    );
+
+    renderDraftList();
+
+
+    if (showStatus) {
+
+        updateSaveStatus(
+            "DRAFT SAVED"
+        );
+
+    }
+
+    return true;
+
+}
+
+
+/* =====================================================
+   MIGRATE OLD SINGLE DRAFT
+===================================================== */
+
+function migrateLegacyDraft() {
+
+    const existing =
+        getDrafts();
+
+
+    if (existing.length) {
+
+        return;
+
+    }
+
+
+    const legacy =
+        localStorage.getItem(
+            LEGACY_DRAFT_KEY
+        );
+
+
+    if (!legacy) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const draft =
+            JSON.parse(legacy);
+
+
+        if (
+            !draft ||
+            !(
+                draft.title ||
+                draft.category ||
+                draft.tags ||
+                draft.content
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const migrated = {
+
+            id:
+                createDraftId(),
+
+            title:
+                draft.title || "",
+
+            category:
+                draft.category || "",
+
+            tags:
+                draft.tags || "",
+
+            content:
+                draft.content || "",
+
+            savedAt:
+                draft.savedAt ||
+                new Date().toISOString()
+
+        };
+
+
+        setDrafts(
+            [migrated]
+        );
+
+
+        localStorage.removeItem(
+            LEGACY_DRAFT_KEY
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Legacy draft migration failed:",
+            error
+        );
+
+    }
+
+}
+
 
 /* =====================================================
    SAVE DRAFT
@@ -1362,22 +1782,11 @@ function getDraftData() {
 
 function saveDraft() {
 
-    const draft =
-        getDraftData();
-
-
-    localStorage.setItem(
-        DRAFT_KEY,
-        JSON.stringify(draft)
-    );
-
-
-    updateSaveStatus(
-        "DRAFT SAVED"
+    saveCurrentDraft(
+        true
     );
 
 }
-
 
 
 /* =====================================================
@@ -1386,13 +1795,19 @@ function saveDraft() {
 
 function autoSaveDraft() {
 
-    const draft =
-        getDraftData();
+    /*
+       Do not create an unwanted empty draft.
+    */
+
+    if (!hasEditorContent()) {
+
+        return;
+
+    }
 
 
-    localStorage.setItem(
-        DRAFT_KEY,
-        JSON.stringify(draft)
+    saveCurrentDraft(
+        false
     );
 
 
@@ -1403,10 +1818,377 @@ function autoSaveDraft() {
 }
 
 
+/* =====================================================
+   DRAFT MANAGER
+===================================================== */
+
+function toggleDraftManager() {
+
+    const manager =
+        document.getElementById(
+            "draftManager"
+        );
+
+
+    manager.classList.toggle(
+        "hidden"
+    );
+
+
+    if (
+        !manager.classList.contains(
+            "hidden"
+        )
+    ) {
+
+        renderDraftList();
+
+    }
+
+}
+
+
+function formatDraftDate(
+    value
+) {
+
+    if (!value) {
+
+        return "Unknown time";
+
+    }
+
+
+    try {
+
+        return new Date(
+            value
+        ).toLocaleString(
+            "en-US",
+            {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    } catch {
+
+        return "Unknown time";
+
+    }
+
+}
+
+
+function renderDraftList() {
+
+    const list =
+        document.getElementById(
+            "draftList"
+        );
+
+
+    if (!list) {
+
+        return;
+
+    }
+
+
+    const drafts =
+        getDrafts()
+            .sort(
+                (a, b) =>
+                    new Date(
+                        b.savedAt || 0
+                    ) -
+                    new Date(
+                        a.savedAt || 0
+                    )
+            );
+
+
+    if (!drafts.length) {
+
+        list.innerHTML = `
+            <div class="draft-empty">
+                No local drafts yet.
+                Click + NEW NOTE and start writing.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        drafts
+            .map(
+                draft => {
+
+                    const title =
+                        escapeHTML(
+                            draft.title ||
+                            "Untitled draft"
+                        );
+
+                    const category =
+                        escapeHTML(
+                            draft.category ||
+                            "Uncategorized"
+                        );
+
+                    const isCurrent =
+                        draft.id ===
+                        currentDraftId;
+
+
+                    return `
+                        <div
+                            class="draft-item ${isCurrent ? "current" : ""}">
+
+                            <div class="draft-item-info">
+
+                                <div class="draft-item-title">
+                                    ${title}
+                                </div>
+
+                                <div class="draft-item-meta">
+                                    ${category}
+                                    •
+                                    ${formatDraftDate(
+                                        draft.savedAt
+                                    )}
+                                    ${isCurrent
+                                        ? " • CURRENT"
+                                        : ""}
+                                </div>
+
+                            </div>
+
+                            <div class="draft-item-actions">
+
+                                <button
+                                    class="draft-small-btn"
+                                    onclick="loadDraftById('${draft.id}')">
+                                    OPEN
+                                </button>
+
+                                <button
+                                    class="draft-small-btn delete"
+                                    onclick="deleteDraftById('${draft.id}')">
+                                    DELETE
+                                </button>
+
+                            </div>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+
+}
+
+
+function loadDraftById(
+    draftId
+) {
+
+    const draft =
+        getDrafts().find(
+            item =>
+                item.id ===
+                draftId
+        );
+
+
+    if (!draft) {
+
+        alert(
+            "This draft could not be found."
+        );
+
+        renderDraftList();
+
+        return;
+
+    }
+
+
+    const hasChanges =
+        hasEditorContent() &&
+        currentDraftId !== draftId;
+
+
+    if (hasChanges) {
+
+        const proceed =
+            confirm(
+                "You have content in the current editor.\n\n" +
+                "Your current content is already auto-saved.\n\n" +
+                "Open this different draft?"
+            );
+
+
+        if (!proceed) {
+
+            return;
+
+        }
+
+    }
+
+
+    currentDraftId =
+        draft.id;
+
+
+    titleInput.value =
+        draft.title || "";
+
+    categoryInput.value =
+        draft.category || "";
+
+    tagsInput.value =
+        draft.tags || "";
+
+    articleContent.innerHTML =
+        draft.content || "";
+
+
+    updateSaveStatus(
+        "DRAFT RESTORED"
+    );
+
+
+    document
+        .getElementById(
+            "draftManager"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+
+    articleContent.focus();
+
+}
+
+
+function loadDraft() {
+
+    const manager =
+        document.getElementById(
+            "draftManager"
+        );
+
+
+    manager.classList.remove(
+        "hidden"
+    );
+
+
+    renderDraftList();
+
+}
+
+
+function deleteDraftById(
+    draftId
+) {
+
+    const drafts =
+        getDrafts();
+
+
+    const draft =
+        drafts.find(
+            item =>
+                item.id ===
+                draftId
+        );
+
+
+    if (!draft) {
+
+        renderDraftList();
+
+        return;
+
+    }
+
+
+    const title =
+        draft.title ||
+        "Untitled draft";
+
+
+    const confirmed =
+        confirm(
+            `Delete draft "${title}"?\n\n` +
+            "This only deletes the local browser draft.\n" +
+            "It does not affect any published article."
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    const remaining =
+        drafts.filter(
+            item =>
+                item.id !==
+                draftId
+        );
+
+
+    setDrafts(
+        remaining
+    );
+
+
+    if (
+        currentDraftId ===
+        draftId
+    ) {
+
+        currentDraftId =
+            null;
+
+        titleInput.value = "";
+
+        categoryInput.value = "";
+
+        tagsInput.value = "";
+
+        articleContent.innerHTML = "";
+
+        updateSaveStatus(
+            "DRAFT DELETED"
+        );
+
+    }
+
+
+    renderDraftList();
+
+}
+
 
 /* =====================================================
    STATUS
-===================================================== */
+=====================================================
+
+*/
 
 function updateSaveStatus(message) {
 
@@ -2305,25 +3087,21 @@ function closePreview() {
 function newNote() {
 
     const hasContent =
-        titleInput.value.trim() ||
-        categoryInput.value.trim() ||
-        tagsInput.value.trim() ||
-        articleContent.innerText.trim();
+        hasEditorContent();
 
 
     if (hasContent) {
 
+        saveCurrentDraft(
+            false
+        );
+
+
         const confirmNew =
             confirm(
-
                 "Start a new note?\n\n" +
-
-                "Your current article is already " +
-
-                "saved as a draft.\n\n" +
-
-                "The current editor will be cleared."
-
+                "Your current article will remain safely " +
+                "saved as a separate local draft."
             );
 
 
@@ -2334,6 +3112,10 @@ function newNote() {
         }
 
     }
+
+
+    currentDraftId =
+        null;
 
 
     titleInput.value = "";
@@ -2355,10 +3137,11 @@ function newNote() {
     );
 
 
+    renderDraftList();
+
     articleContent.focus();
 
 }
-
 
 
 /* =====================================================
@@ -2633,14 +3416,15 @@ window.addEventListener(
     "load",
     function() {
 
+        migrateLegacyDraft();
 
-        const saved =
-            localStorage.getItem(
-                DRAFT_KEY
-            );
+        renderDraftList();
+
+        const drafts =
+            getDrafts();
 
 
-        if (!saved) {
+        if (!drafts.length) {
 
             return;
 
@@ -2649,17 +3433,24 @@ window.addEventListener(
 
         const restore =
             confirm(
-
-                "A saved draft was found.\n\n" +
-
-                "Do you want to restore it?"
-
+                `${drafts.length} local draft` +
+                `${drafts.length === 1 ? "" : "s"} found.\n\n` +
+                "Open the draft manager to choose one?"
             );
 
 
         if (restore) {
 
-            loadDraft();
+            const manager =
+                document.getElementById(
+                    "draftManager"
+                );
+
+            manager.classList.remove(
+                "hidden"
+            );
+
+            renderDraftList();
 
         }
 
